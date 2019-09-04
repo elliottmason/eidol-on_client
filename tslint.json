@@ -1,0 +1,32 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-config-prettier",
+    "tslint-eslint-rules",
+    "tslint-react",
+    "tslint:all"
+  ],
+  "jsRules": {},
+  "rules": {
+    "completed-docs": false,
+    "file-name-casing": {
+      "options": [
+        "camel-case",
+        "pascal-case"
+      ]
+    },
+    "no-import-side-effect": [
+      true,
+      {
+        "ignore-pattern": "/rxjs.*/"
+      }
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-pascal-case"
+    ]
+  },
+  "rulesDirectory": []
+}
