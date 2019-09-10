@@ -8,6 +8,14 @@
   ],
   "jsRules": {},
   "rules": {
+    "invalid-void": [
+      true,
+      {
+        "allow-generics": [
+          "Promise"
+        ]
+      }
+    ],
     "completed-docs": false,
     "file-name-casing": {
       "options": [
