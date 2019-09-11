@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 import { IBoardPosition, IBoardProps } from "../interfaces";
 
@@ -16,34 +16,61 @@ export class Board extends React.Component<IBoardProps> {
   // tslint:disable-next-line: prefer-function-over-method
   public render(): JSX.Element {
     return (
-      <div>
+      <div id={"board"} style={this.style()}>
         {this.renderBoardPositions()}
       </div>
     );
   }
 
-  public renderBoardPositions(): JSX.Element[] {
+  private boardDimensionSize(dimension: "x" | "y"): number {
+    const coords: number[] =
+      this.props.board.map(
+        (position: IBoardPosition) => (position[dimension]),
+      );
+
+    return coords.reduce(
+      (a: number, b: number) => (Math.max(a, b)),
+    );
+  }
+
+  private boardHeight(): number {
+    return this.boardDimensionSize("y");
+  }
+
+  private boardWidth(): number {
+    return this.boardDimensionSize("x");
+  }
+
+  private renderBoardPositions(): JSX.Element[] {
     return this.props.board.map(
       (boardPosition: IBoardPosition) => {
+        let x: number;
+        let y: number;
         if (this.props.isReversed) {
-          const boardSizeWhichShouldNotBeHardcodedHere: number = 3;
-          const x: number =
-            boardSizeWhichShouldNotBeHardcodedHere - boardPosition.x;
-          const y: number =
-            boardSizeWhichShouldNotBeHardcodedHere - boardPosition.y;
+          x = this.boardWidth() - boardPosition.x;
+          y = this.boardHeight() - boardPosition.y;
         } else {
-          const { x, y } = boardPosition;
+          x = boardPosition.x;
+          y = boardPosition.y;
         }
 
         return (
           <BoardPosition
             id={boardPosition.id}
             key={boardPosition.id}
-            x={boardPosition.x}
-            y={boardPosition.y}
+            x={x}
+            y={y}
           />
         );
       },
     );
   }
+
+  private readonly style = (): CSSProperties => (
+    {
+      height: "403px",
+      position: "relative",
+      width: "403px",
+    }
+  )
 }

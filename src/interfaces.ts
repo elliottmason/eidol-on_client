@@ -1,5 +1,5 @@
 type Board = IBoardPosition[];
-type Id = string;
+export type Id = string;
 type MatchEventCategory = "damage" | "relocation";
 type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
@@ -27,14 +27,28 @@ export interface IBoardProps {
   isReversed: boolean;
 }
 
-export interface ICombatant {
+export type ICombatant = IEnemyCombatant | IFriendlyCombatant;
+
+interface IMatchCombatant {
+  boardPositionId?: Id;
   id: Id;
   isFriendly: boolean;
   name: string;
 }
 
+export interface IFriendlyCombatant extends IMatchCombatant {
+  maximumHealth: number;
+  moves: [];
+  remainingHealth: number;
+}
+
+export interface IEnemyCombatant extends IMatchCombatant {
+  remainingHealthPercentage: number;
+}
+
 export interface IMatch {
   board: Board;
+  combatants: ICombatant[];
   events: IMatchEvent[];
   id: Id;
   players: IPlayer[];

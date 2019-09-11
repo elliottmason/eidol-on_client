@@ -12,6 +12,7 @@ import { IActionSyncMatch, IAppState } from "./interfaces";
 const initialState: IAppState = {
   match: {
     board: [],
+    combatants: [],
     events: [],
     id: "0",
     players: [],

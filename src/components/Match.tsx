@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 
 import { IMatchProps } from "../interfaces";
 
@@ -8,9 +8,19 @@ export class Match extends React.Component<IMatchProps> {
   // tslint:disable-next-line: prefer-function-over-method
   public render(): JSX.Element {
     return (
-      <div>
+      <div style={this.style()}>
         <Board board={this.props.match.board} />
-      </div>
+      </div >
     );
   }
+
+  private readonly style = (): CSSProperties => (
+    {
+      alignItems: "center",
+      display: "flex",
+      height: "100%",
+      justifyContent: "center",
+      position: "relative",
+    }
+  )
 }
