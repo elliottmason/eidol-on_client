@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedComponentClass } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
@@ -63,4 +63,6 @@ class AppComponent extends React.Component<IAppProps> {
 const mapStateToProps: (state: IAppState) => IMatchProps =
   (state: IAppState): IMatchProps => ({ match: state.match });
 
-export const App: React.ComponentClass = connect(mapStateToProps)(AppComponent);
+export const App:
+  ConnectedComponentClass<typeof AppComponent, Pick<IAppProps, never>> =
+  connect(mapStateToProps)(AppComponent);

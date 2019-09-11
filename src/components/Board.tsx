@@ -16,7 +16,7 @@ export class Board extends React.Component<IBoardProps> {
   // tslint:disable-next-line: prefer-function-over-method
   public render(): JSX.Element {
     return (
-      <div id={"board"} style={this.style()}>
+      <div className="Board" style={this.style()}>
         {this.renderBoardPositions()}
       </div>
     );

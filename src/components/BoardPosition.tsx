@@ -8,25 +8,20 @@ import { FriendlyCombatant } from "./FriendlyCombatant";
 
 interface IBoardPositionProps {
   id: string;
-  occupants: ICombatant[];
+  occupants?: ICombatant[];
   x: number;
   y: number;
 }
 
-interface IDefaultProps {
+interface IBoardPositionComponentProps extends IBoardPositionProps {
   occupants: ICombatant[];
 }
 
 class BoardPositionComponent
-  extends React.Component<IBoardPositionProps> {
-  public static defaultProps: IDefaultProps = {
-    occupants: [],
-  };
-
-  // tslint:disable-next-line: prefer-function-over-method
+  extends React.Component<IBoardPositionComponentProps> {
   public render(): JSX.Element {
     return (
-      <div style={this.style()}>
+      <div className="BoardPosition" style={this.style()}>
         {this.renderOccupants()}
       </div>
     );
@@ -55,7 +50,7 @@ class BoardPositionComponent
   }
 
   private style(): CSSProperties {
-    const boardSquareSize: number = 100;
+    const boardSquareSize: number = 150;
     const borderWidth: number = 2;
     const bottom: number = this.props.y * boardSquareSize;
     const left: number = this.props.x * boardSquareSize;
@@ -77,11 +72,11 @@ class BoardPositionComponent
 
 const mapStateToProps: (
   state: IAppState,
-  ownProps: IBoardPositionProps,
-) => IBoardPositionProps = (
+  ownProps: { id: Id; x: number; y: number },
+) => IBoardPositionComponentProps = (
   state: IAppState,
-  ownProps: IBoardPositionProps,
-  ): IBoardPositionProps => {
+  ownProps: { id: Id; x: number; y: number },
+  ): IBoardPositionComponentProps => {
     const boardPositionId: Id = ownProps.id;
     const occupants: ICombatant[] =
       state.match.combatants.filter(
