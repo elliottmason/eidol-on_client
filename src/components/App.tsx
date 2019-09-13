@@ -6,7 +6,6 @@ import {
   IActionSyncMatch,
   IAppState,
   IMatch,
-  IMatchProps,
 } from "./../interfaces";
 import "./../stylesheets/App.css";
 import { Match } from "./Match";
@@ -60,8 +59,10 @@ class AppComponent extends React.Component<IAppProps> {
   }
 }
 
-const mapStateToProps: (state: IAppState) => IMatchProps =
-  (state: IAppState): IMatchProps => ({ match: state.match });
+const mapStateToProps: (state: IAppState) => { match: IMatch } =
+  (state: IAppState): { match: IMatch } => (
+    { match: state.match }
+  );
 
 export const App:
   ConnectedComponentClass<typeof AppComponent, Pick<IAppProps, never>> =

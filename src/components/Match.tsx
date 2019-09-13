@@ -3,15 +3,29 @@ import React, { CSSProperties } from "react";
 import { IMatchProps } from "../interfaces";
 
 import { Board } from "./Board";
+import { MoveSelectionMenu } from "./MoveSelectionMenu";
 
 export class Match extends React.Component<IMatchProps> {
-  // tslint:disable-next-line: prefer-function-over-method
   public render(): JSX.Element {
     return (
-      <div style={this.style()}>
+      <div className="Match" style={this.style()}>
         <Board board={this.props.match.board} />
+        {this.renderMenu()}
       </div >
     );
+  }
+
+  private renderMenu(): JSX.Element | undefined {
+    switch (this.props.match.context.kind) {
+      case ("deployedCombatantMoveSelection"):
+        return (
+          <MoveSelectionMenu
+            combatant={this.props.match.context.combatant}
+          />
+        );
+      default:
+        return undefined;
+    }
   }
 
   private readonly style = (): CSSProperties => (

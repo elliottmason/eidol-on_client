@@ -1,19 +1,46 @@
-type Board = IBoardPosition[];
+import { List } from "immutable";
+
 export type Id = string;
 type MatchEventCategory = "damage" | "relocation";
 type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
 
-interface IAction {
+export type Action =
+  | IActionSelectMove
+  | IActionSyncMatch
+  | IActionTargetBoardPosition;
+
+export interface IAction {
   type: string;
+}
+export interface IActionSelectMove extends IAction {
+  move: IMove;
+  type: "SELECT_MOVE";
 }
 
 export interface IActionSyncMatch extends IAction {
   match: IMatch;
+  type: "SYNC_MATCH";
+}
+
+export interface IActionTargetBoardPosition extends IAction {
+  boardPositionId: Id;
+  type: "TARGET_BOARD_POSITION";
 }
 
 export interface IAppState {
   match: IMatch;
+  moveQueue: List<IMoveSelection>;
+}
+
+interface IMoveSelection {
+  boardPositionId?: Id;
+  combatantId: Id;
+  moveId: Id;
+}
+
+export interface IBoard {
+  positions: IBoardPosition[];
 }
 
 export interface IBoardPosition {
@@ -23,7 +50,7 @@ export interface IBoardPosition {
 }
 
 export interface IBoardProps {
-  board: Board;
+  board: IBoard;
   isReversed: boolean;
 }
 
@@ -32,23 +59,72 @@ export type ICombatant = IEnemyCombatant | IFriendlyCombatant;
 interface IMatchCombatant {
   boardPositionId?: Id;
   id: Id;
-  isFriendly: boolean;
   name: string;
 }
 
 export interface IFriendlyCombatant extends IMatchCombatant {
+  isFriendly: true;
+  isQueued: boolean;
   maximumHealth: number;
-  moves: [];
+  moves: IMove[];
   remainingHealth: number;
 }
 
 export interface IEnemyCombatant extends IMatchCombatant {
+  isFriendly: false;
   remainingHealthPercentage: number;
 }
 
+export interface IMove {
+  id: string;
+  name: string;
+}
+
+interface IBenchedCombatantPlacement {
+  combatant: ICombatant;
+  kind: "benchedCombatantPlacement";
+}
+
+interface IBenchedCombatantSelection {
+  kind: "benchedCombatantSelection";
+}
+
+interface IDeployedCombatantMoveSelection {
+  combatant: IFriendlyCombatant;
+  kind: "deployedCombatantMoveSelection";
+}
+
+interface IDeployedCombatantMoveTargeting {
+  combatant: IFriendlyCombatant;
+  kind: "deployedCombatantMoveTargeting";
+  move: IMove;
+}
+
+interface IMatchNotLoaded {
+  kind: "matchNotLoaded";
+}
+
+interface IMoveSelectionConfirmation {
+  kind: "moveSelectionConfirmation";
+}
+
+interface ITurnResolution {
+  kind: "turnResolution";
+}
+
+export type MatchContext =
+  | IBenchedCombatantPlacement
+  | IBenchedCombatantSelection
+  | IDeployedCombatantMoveSelection
+  | IDeployedCombatantMoveTargeting
+  | IMatchNotLoaded
+  | IMoveSelectionConfirmation
+  | ITurnResolution;
+
 export interface IMatch {
-  board: Board;
-  combatants: ICombatant[];
+  board: IBoard;
+  combatants: List<ICombatant>;
+  context: MatchContext;
   events: IMatchEvent[];
   id: Id;
   players: IPlayer[];
@@ -74,8 +150,6 @@ interface IPlayer {
 }
 
 export interface IMatchProps {
+  context?: MatchContext;
   match: IMatch;
 }
-
-export type MatchContext = CombatantDeployment | "in_progress";
-type CombatantDeployment = "combatant_selection" | "combatant_placement";

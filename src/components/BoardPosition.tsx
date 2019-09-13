@@ -1,40 +1,75 @@
+import { List } from "immutable";
 import React, { CSSProperties } from "react";
 import { connect } from "react-redux";
 
-import { IAppState, ICombatant, Id, IEnemyCombatant, IFriendlyCombatant } from "../interfaces";
+import {
+  IActionTargetBoardPosition,
+  IAppState,
+  ICombatant,
+  Id,
+  MatchContext,
+} from "../interfaces";
 
 import { EnemyCombatant } from "./EnemyCombatant";
 import { FriendlyCombatant } from "./FriendlyCombatant";
 
 interface IBoardPositionProps {
   id: string;
-  occupants?: ICombatant[];
   x: number;
   y: number;
 }
 
 interface IBoardPositionComponentProps extends IBoardPositionProps {
-  occupants: ICombatant[];
+  matchContext: MatchContext;
+  occupants: List<ICombatant>;
+  dispatch(func: {}): void;
 }
+
+const targetPosition: (boardPositionId: Id) => IActionTargetBoardPosition =
+  (boardPositionId: Id): IActionTargetBoardPosition => (
+    {
+      boardPositionId,
+      type: "TARGET_BOARD_POSITION",
+    }
+  );
 
 class BoardPositionComponent
   extends React.Component<IBoardPositionComponentProps> {
+  private readonly handleClick: (e: React.MouseEvent) => void =
+    this._handleClick.bind(this);
+
   public render(): JSX.Element {
     return (
-      <div className="BoardPosition" style={this.style()}>
+      <div
+        className="BoardPosition"
+        onClick={this.handleClick}
+        style={this.style()}
+      >
         {this.renderOccupants()}
       </div>
     );
   }
 
-  private renderOccupants(): JSX.Element[] {
-    return this.props.occupants.map(
+  private _handleClick(e: React.MouseEvent): void {
+    const { dispatch } = this.props;
+
+    switch (this.props.matchContext.kind) {
+      case "deployedCombatantMoveTargeting":
+        dispatch(targetPosition(this.props.id));
+        break;
+      default:
+        return;
+    }
+  }
+
+  private renderOccupants(): List<JSX.Element> {
+    const occupants: List<JSX.Element> = this.props.occupants.map(
       (combatant: ICombatant) => {
         if (combatant.isFriendly) {
           return (
             <FriendlyCombatant
               key={combatant.id}
-              combatant={combatant as IFriendlyCombatant}
+              combatant={combatant}
             />
           );
         }
@@ -42,11 +77,13 @@ class BoardPositionComponent
         return (
           <EnemyCombatant
             key={combatant.id}
-            combatant={combatant as IEnemyCombatant}
+            combatant={combatant}
           />
         );
       },
     );
+
+    return occupants;
   }
 
   private style(): CSSProperties {
@@ -70,25 +107,30 @@ class BoardPositionComponent
   }
 }
 
+interface IMappedProps {
+  matchContext: MatchContext;
+  occupants: List<ICombatant>;
+}
+
 const mapStateToProps: (
   state: IAppState,
-  ownProps: { id: Id; x: number; y: number },
-) => IBoardPositionComponentProps = (
+  ownProps: { id: Id },
+) => IMappedProps = (
   state: IAppState,
-  ownProps: { id: Id; x: number; y: number },
-  ): IBoardPositionComponentProps => {
+  ownProps: { id: Id },
+  ): IMappedProps => {
     const boardPositionId: Id = ownProps.id;
-    const occupants: ICombatant[] =
+    const occupants: List<ICombatant> =
       state.match.combatants.filter(
         (combatant: ICombatant) =>
           (combatant.boardPositionId === boardPositionId),
       );
 
     return {
+      matchContext: state.match.context,
       occupants,
-      ...ownProps,
     };
   };
 
-export const BoardPosition: React.ComponentClass<IBoardPositionProps> =
+export const BoardPosition =
   connect(mapStateToProps)(BoardPositionComponent);

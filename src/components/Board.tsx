@@ -24,7 +24,7 @@ export class Board extends React.Component<IBoardProps> {
 
   private boardDimensionSize(dimension: "x" | "y"): number {
     const coords: number[] =
-      this.props.board.map(
+      this.props.board.positions.map(
         (position: IBoardPosition) => (position[dimension]),
       );
 
@@ -42,7 +42,7 @@ export class Board extends React.Component<IBoardProps> {
   }
 
   private renderBoardPositions(): JSX.Element[] {
-    return this.props.board.map(
+    return this.props.board.positions.map(
       (boardPosition: IBoardPosition) => {
         let x: number;
         let y: number;
@@ -68,9 +68,9 @@ export class Board extends React.Component<IBoardProps> {
 
   private readonly style = (): CSSProperties => (
     {
-      height: "403px",
+      height: "100%",
       position: "relative",
-      width: "403px",
+      width: "100%",
     }
   )
 }
