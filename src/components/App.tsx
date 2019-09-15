@@ -20,14 +20,6 @@ const fetchMatch: (matchId: string) => Promise<Response> =
     fetch(`http://localhost:4000/matches/${matchId}.json`)
   );
 
-const syncMatch: (match: IMatch) => IActionSyncMatch =
-  (match: IMatch): IActionSyncMatch => (
-    {
-      match,
-      type: "SYNC_MATCH",
-    }
-  );
-
 const loadMatch:
   (matchId: string) => (dispatch: Dispatch) => Promise<void> =
   (matchId: string): (dispatch: Dispatch) => Promise<void> => (
@@ -39,10 +31,18 @@ const loadMatch:
               .then(
                 (json: IMatch) => dispatch(syncMatch(json)),
                 // tslint:disable-next-line: no-console
-                (error: {}) => console.log(error),
+                (error) => console.error(error),
               );
           },
         )
+  );
+
+const syncMatch: (match: IMatch) => IActionSyncMatch =
+  (match: IMatch): IActionSyncMatch => (
+    {
+      match,
+      type: "SYNC_MATCH",
+    }
   );
 
 class AppComponent extends React.Component<IAppProps> {

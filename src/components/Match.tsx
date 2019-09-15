@@ -1,9 +1,10 @@
 import React, { CSSProperties } from "react";
 
-import { IMatchProps } from "../interfaces";
+import { IMatchProps, IFriendlyCombatant, ICombatant } from "../interfaces";
 
 import { Board } from "./Board";
 import { MoveSelectionMenu } from "./MoveSelectionMenu";
+import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu"
 
 export class Match extends React.Component<IMatchProps> {
   public render(): JSX.Element {
@@ -18,9 +19,26 @@ export class Match extends React.Component<IMatchProps> {
   private renderMenu(): JSX.Element | undefined {
     switch (this.props.match.context.kind) {
       case ("deployedCombatantMoveSelection"):
+        const combatantId: string = this.props.match.context.combatantId;
+        const combatant: ICombatant | undefined =
+          this.props.match.combatants.find(
+            (potentialCombatant: ICombatant) =>
+              (potentialCombatant.id === combatantId),
+          );
+
+        if (combatant !== undefined) {
+          return (
+            <MoveSelectionMenu
+              combatant={combatant as IFriendlyCombatant}
+            />
+          );
+        }
+        break;
+      case ("moveSelectionConfirmation"):
+
         return (
-          <MoveSelectionMenu
-            combatant={this.props.match.context.combatant}
+          <MoveSelectionConfirmationMenu
+            moves={this.props.match.selectedMoves}
           />
         );
       default:

@@ -15,7 +15,7 @@ interface IMoveSelectionMenuItemComponentProps
 const selectMove: (move: IMove) => IActionSelectMove =
   (move: IMove): IActionSelectMove => (
     {
-      move,
+      moveId: move.id,
       type: "SELECT_MOVE",
     }
   );

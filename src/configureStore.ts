@@ -15,8 +15,12 @@ import {
   IActionTargetBoardPosition,
   IAppState,
   ICombatant,
+  Id,
   IFriendlyCombatant,
+  IMoveSelection,
   MatchContext,
+  IMatchUpdatePending,
+  IDeployedCombatantMoveTargeting,
 } from "./interfaces";
 
 const initialState: IAppState = {
@@ -27,9 +31,9 @@ const initialState: IAppState = {
     events: [],
     id: "0",
     players: [],
+    selectedMoves: List(),
     turn: 0,
   },
-  moveQueue: List(),
 };
 
 const nullCombatant: IFriendlyCombatant = {
@@ -46,20 +50,37 @@ const selectMove: (state: IAppState, action: IActionSelectMove) => IAppState = (
   state: IAppState,
   action: IActionSelectMove,
 ): IAppState => {
-  const combatant: ICombatant =
+  const combatantId: Id =
     state.match.context.kind === "deployedCombatantMoveSelection"
-      ? state.match.context.combatant
-      : nullCombatant;
+      ? state.match.context.combatantId
+      : "0";
 
-  const matchContext: MatchContext = {
-    combatant,
+  const newMatchContext: IDeployedCombatantMoveTargeting = {
+    combatantId,
     kind: "deployedCombatantMoveTargeting",
-    move: action.move,
+    moveId: action.moveId,
   };
 
   return {
     ...state,
-    match: { ...state.match, context: matchContext },
+    match: { ...state.match, context: newMatchContext },
+  };
+};
+
+const submitSelectedMoves: (state: IAppState) => IAppState = (
+  state: IAppState,
+): IAppState => {
+  const newMatchContext: IMatchUpdatePending = {
+    kind: "matchUpdatePending",
+  };
+
+  return {
+    ...state,
+    match: {
+      ...state.match,
+      context: newMatchContext,
+      selectedMoves: List(),
+    },
   };
 };
 
@@ -67,13 +88,13 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   state: IAppState,
   action: IActionSyncMatch,
 ): IAppState => {
-  const combatants: List<ICombatant> = List(
+  const newCombatants: List<ICombatant> = List(
     action.match.combatants.map((combatant: ICombatant) => ({
       ...combatant,
       isQueued: false,
     })),
   );
-  const friendlyCombatants: List<ICombatant> = combatants.filter(
+  const friendlyCombatants: List<ICombatant> = newCombatants.filter(
     (combatant: ICombatant) => combatant.isFriendly,
   );
   const selectedCombatant: ICombatant = friendlyCombatants.get(
@@ -81,18 +102,18 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     nullCombatant,
   ) as IFriendlyCombatant;
 
-  const context: MatchContext = {
-    combatant: selectedCombatant,
+  const newMatchContext: MatchContext = {
+    combatantId: selectedCombatant.id,
     kind: "deployedCombatantMoveSelection",
   };
 
   return {
     match: {
       ...action.match,
-      combatants,
-      context,
+      combatants: newCombatants,
+      context: newMatchContext,
+      selectedMoves: List(),
     },
-    moveQueue: List(),
   };
 };
 
@@ -114,7 +135,9 @@ const targetBoardPosition: (
       combatant.boardPositionId !== undefined,
   );
 
-  if (unqueuedFriendlyCombatants.size === 1) {
+  /* We haven't queued the Combatant that's using this move, so we check for 1
+     unqueued Combatant here */
+  if (unqueuedFriendlyCombatants.size <= 1) {
     newMatchContext = { kind: "moveSelectionConfirmation" };
   } else {
     const combatant: ICombatant = unqueuedFriendlyCombatants.get(
@@ -123,16 +146,28 @@ const targetBoardPosition: (
     );
 
     newMatchContext = {
-      combatant: combatant as IFriendlyCombatant,
+      combatantId: combatant.id,
       kind: "deployedCombatantMoveSelection",
     };
   }
+
+  const boardPositionId: Id = action.boardPositionId;
+
+  const combatantId: Id =
+    state.match.context.kind === "deployedCombatantMoveTargeting"
+      ? state.match.context.combatantId
+      : "0";
+
+  const moveId: Id =
+    state.match.context.kind === "deployedCombatantMoveTargeting"
+      ? state.match.context.moveId
+      : "0";
 
   const newCombatants: List<ICombatant> = state.match.combatants.map(
     (combatant: ICombatant) => {
       if (
         state.match.context.kind === "deployedCombatantMoveTargeting" &&
-        state.match.context.combatant.id === combatant.id
+        combatantId === combatant.id
       ) {
         return {
           ...combatant,
@@ -144,12 +179,21 @@ const targetBoardPosition: (
     },
   );
 
+  const newSelectedMoves: List<IMoveSelection> = state.match.selectedMoves.push(
+    {
+      boardPositionId,
+      combatantId,
+      moveId,
+    },
+  );
+
   return {
     ...state,
     match: {
       ...state.match,
       combatants: newCombatants,
       context: newMatchContext,
+      selectedMoves: newSelectedMoves,
     },
   };
 };
@@ -164,6 +208,8 @@ export const rootReducer: (
   switch (action.type) {
     case "SELECT_MOVE":
       return selectMove(state, action);
+    case "SUBMIT_SELECTED_MOVES":
+      return submitSelectedMoves(state);
     case "SYNC_MATCH":
       return syncMatch(state, action);
     case "TARGET_BOARD_POSITION":

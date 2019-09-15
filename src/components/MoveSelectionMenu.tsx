@@ -13,18 +13,20 @@ export class MoveSelectionMenu extends React.Component<IMoveSelectionMenuProps> 
     return (
       <div>
         <p>select a move for <strong>{this.props.combatant.name}</strong>:</p>
-        <div>{this.moveButtons()}</div>
-      </div>
+        {this.moveButtons()}
+      </div >
     );
   }
 
-  private moveButtons(): JSX.Element[] {
+  private moveButtons(): JSX.Element {
     const moves: IMove[] = this.props.combatant.moves;
 
-    return moves.map(
+    const buttons: JSX.Element[] = moves.map(
       (move: IMove) => (
         <MoveSelectionMenuItem key={move.id} move={move} />
       ),
     );
+
+    return (<div>{buttons}</div>);
   }
 }

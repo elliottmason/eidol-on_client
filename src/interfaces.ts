@@ -7,15 +7,21 @@ type PlayerTeam = 1 | 2;
 
 export type Action =
   | IActionSelectMove
+  | IActionSubmitSelectedMoves
   | IActionSyncMatch
   | IActionTargetBoardPosition;
 
 export interface IAction {
   type: string;
 }
+
 export interface IActionSelectMove extends IAction {
-  move: IMove;
+  moveId: Id;
   type: "SELECT_MOVE";
+}
+
+export interface IActionSubmitSelectedMoves extends IAction {
+  type: "SUBMIT_SELECTED_MOVES";
 }
 
 export interface IActionSyncMatch extends IAction {
@@ -30,10 +36,9 @@ export interface IActionTargetBoardPosition extends IAction {
 
 export interface IAppState {
   match: IMatch;
-  moveQueue: List<IMoveSelection>;
 }
 
-interface IMoveSelection {
+export interface IMoveSelection {
   boardPositionId?: Id;
   combatantId: Id;
   moveId: Id;
@@ -81,7 +86,7 @@ export interface IMove {
 }
 
 interface IBenchedCombatantPlacement {
-  combatant: ICombatant;
+  combatantId: Id;
   kind: "benchedCombatantPlacement";
 }
 
@@ -90,18 +95,22 @@ interface IBenchedCombatantSelection {
 }
 
 interface IDeployedCombatantMoveSelection {
-  combatant: IFriendlyCombatant;
+  combatantId: Id;
   kind: "deployedCombatantMoveSelection";
 }
 
-interface IDeployedCombatantMoveTargeting {
-  combatant: IFriendlyCombatant;
+export interface IDeployedCombatantMoveTargeting {
+  combatantId: Id;
   kind: "deployedCombatantMoveTargeting";
-  move: IMove;
+  moveId: Id;
 }
 
 interface IMatchNotLoaded {
   kind: "matchNotLoaded";
+}
+
+export interface IMatchUpdatePending {
+  kind: "matchUpdatePending";
 }
 
 interface IMoveSelectionConfirmation {
@@ -119,6 +128,7 @@ export type MatchContext =
   | IDeployedCombatantMoveTargeting
   | IMatchNotLoaded
   | IMoveSelectionConfirmation
+  | IMatchUpdatePending
   | ITurnResolution;
 
 export interface IMatch {
@@ -128,6 +138,7 @@ export interface IMatch {
   events: IMatchEvent[];
   id: Id;
   players: IPlayer[];
+  selectedMoves: List<IMoveSelection>;
   turn: number;
 }
 

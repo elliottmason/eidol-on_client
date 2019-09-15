@@ -132,5 +132,5 @@ const mapStateToProps: (
     };
   };
 
-export const BoardPosition =
+export const BoardPosition: React.ComponentClass<IBoardPositionProps> =
   connect(mapStateToProps)(BoardPositionComponent);
