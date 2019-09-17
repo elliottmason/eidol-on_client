@@ -7,7 +7,7 @@ type PlayerTeam = 1 | 2;
 
 export type Action =
   | IActionSelectMove
-  | IActionSubmitSelectedMoves
+  | IActionSubmitMoveSelections
   | IActionSyncMatch
   | IActionTargetBoardPosition;
 
@@ -20,8 +20,8 @@ export interface IActionSelectMove extends IAction {
   type: "SELECT_MOVE";
 }
 
-export interface IActionSubmitSelectedMoves extends IAction {
-  type: "SUBMIT_SELECTED_MOVES";
+export interface IActionSubmitMoveSelections extends IAction {
+  type: "SUBMIT_MOVE_SELECTIONS";
 }
 
 export interface IActionSyncMatch extends IAction {
@@ -137,8 +137,8 @@ export interface IMatch {
   context: MatchContext;
   events: IMatchEvent[];
   id: Id;
+  moveSelections: List<IMoveSelection>;
   players: IPlayer[];
-  selectedMoves: List<IMoveSelection>;
   turn: number;
 }
 

@@ -4,13 +4,13 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
-  IActionSubmitSelectedMoves,
+  IActionSubmitMoveSelections,
   Id,
   IMoveSelection,
 } from "../interfaces";
 
 interface IMoveSelectionConfirmationMenuProps {
-  moves: List<IMoveSelection>;
+  moveSelections: List<IMoveSelection>;
 }
 
 interface IMoveSelectionConfirmationMenuComponentProps
@@ -18,30 +18,53 @@ interface IMoveSelectionConfirmationMenuComponentProps
   dispatch(func: {}): void;
 }
 
-interface IShit {
+interface IMoveSelectionJson {
   board_position_id: Id | undefined;
   match_combatants_move_id: Id;
 }
 
-const awaitMatchUpdate: () => IActionSubmitSelectedMoves =
-  (): IActionSubmitSelectedMoves => (
+const awaitMatchUpdate: () => IActionSubmitMoveSelections =
+  (): IActionSubmitMoveSelections => (
     {
-      type: "SUBMIT_SELECTED_MOVES",
+      type: "SUBMIT_MOVE_SELECTIONS",
     }
   );
 
-const submitSelectedMoves: () => Promise<Response> =
-  (): Promise<Response> => (
-    fetch("http://localhost:4000/match_move_selections", {
-      method: "POST",
-    })
-  );
+const submitMoveSelections:
+  (moveSelections: List<IMoveSelection>) => Promise<Response> =
+  async (moveSelections: List<IMoveSelection>): Promise<Response> => {
+    const bodyArray: IMoveSelectionJson[] =
+      moveSelections.map(
+        (moveSelection: IMoveSelection) => (
+          {
+            board_position_id: moveSelection.boardPositionId,
+            match_combatants_move_id: moveSelection.moveId,
+          }
+        ),
+      )
+        .toArray();
 
-const confirmSelectedMoves = (
+    const bodyObject: {} = {
+      match_move_selections: bodyArray,
+    };
+
+    const body: string = JSON.stringify(bodyObject);
+
+    return fetch("http://localhost:4000/match_move_selections", {
+      body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
+  };
+
+const confirmMoveSelections = (moveSelections: List<IMoveSelection>) => (
   (dispatch: Dispatch) => (
-    submitSelectedMoves()
+    submitMoveSelections(moveSelections)
       .then(
-        () => dispatch(awaitMatchUpdate()),
+        (response: Response) => dispatch(awaitMatchUpdate()),
+        (error) => console.error(error),
       )
   )
 );
@@ -64,7 +87,7 @@ class MoveSelectionConfirmationMenuComponent
   private _confirm(e: React.MouseEvent): void {
     const { dispatch } = this.props;
 
-    dispatch(confirmSelectedMoves);
+    dispatch(confirmMoveSelections(this.props.moveSelections));
   }
 }
 

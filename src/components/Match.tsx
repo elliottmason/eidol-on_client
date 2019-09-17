@@ -38,7 +38,7 @@ export class Match extends React.Component<IMatchProps> {
 
         return (
           <MoveSelectionConfirmationMenu
-            moves={this.props.match.selectedMoves}
+            moveSelections={this.props.match.moveSelections}
           />
         );
       default:

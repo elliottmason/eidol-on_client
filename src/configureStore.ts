@@ -8,6 +8,7 @@ import {
 } from "redux";
 import thunk from "redux-thunk";
 
+import { cableMiddleware } from "./cableMiddleware";
 import {
   Action,
   IActionSelectMove,
@@ -16,11 +17,11 @@ import {
   IAppState,
   ICombatant,
   Id,
+  IDeployedCombatantMoveTargeting,
   IFriendlyCombatant,
+  IMatchUpdatePending,
   IMoveSelection,
   MatchContext,
-  IMatchUpdatePending,
-  IDeployedCombatantMoveTargeting,
 } from "./interfaces";
 
 const initialState: IAppState = {
@@ -30,8 +31,8 @@ const initialState: IAppState = {
     context: { kind: "matchNotLoaded" },
     events: [],
     id: "0",
+    moveSelections: List(),
     players: [],
-    selectedMoves: List(),
     turn: 0,
   },
 };
@@ -67,7 +68,7 @@ const selectMove: (state: IAppState, action: IActionSelectMove) => IAppState = (
   };
 };
 
-const submitSelectedMoves: (state: IAppState) => IAppState = (
+const submitMoveSelections: (state: IAppState) => IAppState = (
   state: IAppState,
 ): IAppState => {
   const newMatchContext: IMatchUpdatePending = {
@@ -79,7 +80,7 @@ const submitSelectedMoves: (state: IAppState) => IAppState = (
     match: {
       ...state.match,
       context: newMatchContext,
-      selectedMoves: List(),
+      moveSelections: List(),
     },
   };
 };
@@ -112,7 +113,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
       ...action.match,
       combatants: newCombatants,
       context: newMatchContext,
-      selectedMoves: List(),
+      moveSelections: List(),
     },
   };
 };
@@ -179,13 +180,13 @@ const targetBoardPosition: (
     },
   );
 
-  const newSelectedMoves: List<IMoveSelection> = state.match.selectedMoves.push(
-    {
-      boardPositionId,
-      combatantId,
-      moveId,
-    },
-  );
+  const newMoveSelections: List<
+    IMoveSelection
+  > = state.match.moveSelections.push({
+    boardPositionId,
+    combatantId,
+    moveId,
+  });
 
   return {
     ...state,
@@ -193,7 +194,7 @@ const targetBoardPosition: (
       ...state.match,
       combatants: newCombatants,
       context: newMatchContext,
-      selectedMoves: newSelectedMoves,
+      moveSelections: newMoveSelections,
     },
   };
 };
@@ -208,8 +209,8 @@ export const rootReducer: (
   switch (action.type) {
     case "SELECT_MOVE":
       return selectMove(state, action);
-    case "SUBMIT_SELECTED_MOVES":
-      return submitSelectedMoves(state);
+    case "SUBMIT_MOVE_SELECTIONS":
+      return submitMoveSelections(state);
     case "SYNC_MATCH":
       return syncMatch(state, action);
     case "TARGET_BOARD_POSITION":
@@ -225,5 +226,5 @@ const composeEnhancers: (a: StoreEnhancer) => IAppState =
 
 export const store: Store<{}> = createStore(
   rootReducer,
-  composeEnhancers(applyMiddleware(thunk)),
+  composeEnhancers(applyMiddleware(cableMiddleware, thunk)),
 );
