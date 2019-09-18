@@ -1,5 +1,5 @@
 import ActionCable from "actioncable";
-import { Dispatch, Reducer, StoreCreator, Action } from "redux";
+import { Action, Dispatch, Reducer, StoreCreator } from "redux";
 
 export const cableMiddleware = ({ dispatch }: { dispatch: Dispatch }) => (
   next: StoreCreator,
@@ -9,8 +9,6 @@ export const cableMiddleware = ({ dispatch }: { dispatch: Dispatch }) => (
     return next(action);
   }
 
-  const cable: ActionCable.Cable = ActionCable.createConsumer("/cable");
-
   const {
     channel,
     room,
@@ -19,17 +17,20 @@ export const cableMiddleware = ({ dispatch }: { dispatch: Dispatch }) => (
     room: string | undefined;
   } = action;
 
-  let { received }: { received(result: any): {} } = action;
+  let { received }: { received?: ((result: any) => {}) | string } = action;
 
   // This action is not ActionCable-related, so keep moving
-  if (channel === undefined || received === undefined || room === undefined) {
+  if (channel === undefined || received === undefined) {
     return next(action);
   }
 
   if (typeof received === "string") {
-    received = (result: any) => dispatch({ type: received, result });
+    received = result => dispatch({ type: received, result });
   }
 
+  const cable: ActionCable.Cable = ActionCable.createConsumer(
+    "ws://localhost:4000/cable",
+  );
   const connected: () => void = (): void => {};
   const disconnected: () => void = (): void => {};
 

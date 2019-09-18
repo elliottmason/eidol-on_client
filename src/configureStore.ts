@@ -213,6 +213,7 @@ export const rootReducer: (
     case "SUBMIT_MOVE_SELECTIONS":
       return submitMoveSelections(state);
     case "SYNC_MATCH":
+      console.log(action);
       return syncMatch(state, action);
     case "TARGET_BOARD_POSITION":
       return targetBoardPosition(state, action);

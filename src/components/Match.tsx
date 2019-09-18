@@ -17,7 +17,7 @@ import { MoveSelectionMenu } from "./MoveSelectionMenu";
 
 interface IMatchProps {
   context?: MatchContext;
-  id: Id;
+  id?: Id;
   match: IMatch;
   path: string;
 }
@@ -26,9 +26,9 @@ export interface IMatchComponentProps extends IMatchProps {
   dispatch(func: {}): void;
 }
 
-const fetchMatch: (matchId: string) => Promise<Response> =
-  (matchId: string): Promise<Response> => (
-    fetch(`http://localhost:4000/matches/${matchId}.json`)
+const fetchMatch: (id: string) => Promise<Response> =
+  (id: string): Promise<Response> => (
+    fetch(`http://localhost:4000/matches/${id}.json`)
   );
 
 const syncMatch: (match: IMatch) => IActionSyncMatch =
@@ -56,11 +56,26 @@ const loadMatch:
         )
   );
 
+const connectToMatch = (id: Id) =>
+  (dispatch: Dispatch) => dispatch({
+    channel: 'MatchesChannel',
+    room: id,
+    received: (match: IMatch) => {
+      return dispatch({
+        match,
+        type: "SYNC_MATCH",
+      })
+    },
+    type: undefined,
+  });
+
 class MatchComponent extends React.Component<IMatchComponentProps> {
   public componentDidMount(): void {
     const { dispatch, id } = this.props;
 
-    dispatch(loadMatch(id));
+    if (id === undefined) { return; }
+
+    dispatch(connectToMatch(id));
   }
 
   public render(): JSX.Element {

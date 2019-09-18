@@ -1,10 +1,8 @@
-import { Router } from "@reach/router"
+import { Router } from "@reach/router";
 import React from "react";
 import { connect, ConnectedComponentClass } from "react-redux";
-import { Dispatch } from "redux";
 
 import {
-  IActionSyncMatch,
   IAppState,
   IMatch,
 } from "./../interfaces";
