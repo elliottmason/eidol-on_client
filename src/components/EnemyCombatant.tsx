@@ -16,7 +16,10 @@ export class EnemyCombatant extends React.Component<IEnemyCombatantProps> {
 
   public render(): JSX.Element {
     return (
-      <div className="EnemyCombatant" style={{ height: "100%" }}>
+      <div
+        className="EnemyCombatant"
+        style={{ height: "100%", textAlign: "center" }}
+      >
         <HealthBar
           remainingHealthPercentage={this.remainingHealthPercentage}
         />
@@ -24,5 +27,4 @@ export class EnemyCombatant extends React.Component<IEnemyCombatantProps> {
       </div>
     );
   }
-
 }

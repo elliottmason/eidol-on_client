@@ -109,6 +109,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   };
 
   return {
+    ...state,
     match: {
       ...action.match,
       combatants: newCombatants,

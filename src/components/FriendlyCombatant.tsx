@@ -12,7 +12,10 @@ export class FriendlyCombatant
   extends React.Component<IFriendlyCombatantProps> {
   public render(): JSX.Element {
     return (
-      <div className="FriendlyCombatant" style={{ height: "100%" }}>
+      <div
+        className="FriendlyCombatant"
+        style={{ height: "100%", textAlign: "center" }}
+      >
         <HealthBar
           maximumHealth={this.props.combatant.maximumHealth}
           remainingHealth={this.props.combatant.remainingHealth}

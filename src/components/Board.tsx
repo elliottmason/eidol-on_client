@@ -68,9 +68,10 @@ export class Board extends React.Component<IBoardProps> {
 
   private readonly style = (): CSSProperties => (
     {
-      height: "100%",
+      border: "1px solid #000",
+      height: "100vmin",
       position: "relative",
-      width: "100%",
+      width: "100vmin",
     }
   )
 }

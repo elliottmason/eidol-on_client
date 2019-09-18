@@ -1,3 +1,4 @@
+import { Router } from "@reach/router"
 import React from "react";
 import { connect, ConnectedComponentClass } from "react-redux";
 import { Dispatch } from "redux";
@@ -8,6 +9,7 @@ import {
   IMatch,
 } from "./../interfaces";
 import "./../stylesheets/App.css";
+import { Index } from "./Index";
 import { Match } from "./Match";
 
 export interface IAppProps {
@@ -15,46 +17,13 @@ export interface IAppProps {
   dispatch(func: {}): void;
 }
 
-const fetchMatch: (matchId: string) => Promise<Response> =
-  (matchId: string): Promise<Response> => (
-    fetch(`http://localhost:4000/matches/${matchId}.json`)
-  );
-
-const syncMatch: (match: IMatch) => IActionSyncMatch =
-  (match: IMatch): IActionSyncMatch => (
-    {
-      match,
-      type: "SYNC_MATCH",
-    }
-  );
-
-const loadMatch:
-  (matchId: string) => (dispatch: Dispatch) => Promise<void> =
-  (matchId: string): (dispatch: Dispatch) => Promise<void> => (
-    (dispatch: Dispatch): Promise<void> =>
-      fetchMatch(matchId)
-        .then(
-          (response: Response) => {
-            response.json()
-              .then(
-                (json: IMatch) => dispatch(syncMatch(json)),
-                // tslint:disable-next-line
-                (error) => console.error(error),
-              );
-          },
-        )
-  );
-
 class AppComponent extends React.Component<IAppProps> {
-  public componentDidMount(): void {
-    const { dispatch } = this.props;
-
-    dispatch(loadMatch("1"));
-  }
-
   public render(): JSX.Element {
     return (
-      <Match match={this.props.match} />
+      <Router style={{ height: "100%" }}>
+        <Index path="/" />
+        <Match path="/matches/:id" match={this.props.match} />
+      </Router>
     );
   }
 }

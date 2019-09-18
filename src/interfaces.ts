@@ -159,8 +159,3 @@ interface IPlayer {
   name: string;
   team: PlayerTeam;
 }
-
-export interface IMatchProps {
-  context?: MatchContext;
-  match: IMatch;
-}

@@ -87,21 +87,21 @@ class BoardPositionComponent
   }
 
   private style(): CSSProperties {
-    const boardSquareSize: number = 150;
-    const borderWidth: number = 2;
-    const bottom: number = this.props.y * boardSquareSize;
-    const left: number = this.props.x * boardSquareSize;
-    const size: number = boardSquareSize - borderWidth;
+    const borderWidth: number = 1;
+    const size: number = 25;
+    const bottom: number = this.props.y * size;
+    const left: number = this.props.x * size;
 
     return {
       borderColor: "black",
       borderStyle: "solid",
       borderWidth: `${borderWidth}px`,
-      bottom: `${bottom}px`,
-      height: `${size}px`,
-      left: `${left}px`,
+      bottom: `${bottom}vmin`,
+      boxSizing: "border-box",
+      height: `${size}vmin`,
+      left: `${left}vmin`,
       position: "absolute",
-      width: `${size}px`,
+      width: `${size}vmin`,
       zIndex: "auto",
     };
   }
