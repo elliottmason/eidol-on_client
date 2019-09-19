@@ -26,11 +26,6 @@ export interface IMatchComponentProps extends IMatchProps {
   dispatch(func: {}): void;
 }
 
-const fetchMatch: (id: string) => Promise<Response> =
-  (id: string): Promise<Response> => (
-    fetch(`http://localhost:4000/matches/${id}.json`)
-  );
-
 const syncMatch: (match: IMatch) => IActionSyncMatch =
   (match: IMatch): IActionSyncMatch => (
     {
@@ -39,35 +34,28 @@ const syncMatch: (match: IMatch) => IActionSyncMatch =
     }
   );
 
-const loadMatch:
-  (matchId: string) => (dispatch: Dispatch) => Promise<void> =
-  (matchId: string): (dispatch: Dispatch) => Promise<void> => (
-    (dispatch: Dispatch): Promise<void> =>
-      fetchMatch(matchId)
-        .then(
-          (response: Response) => {
-            response.json()
-              .then(
-                (json: IMatch) => dispatch(syncMatch(json)),
-                // tslint:disable-next-line
-                (error) => console.error(error),
-              );
-          },
-        )
-  );
-
-const connectToMatch = (id: Id) =>
-  (dispatch: Dispatch) => dispatch({
-    channel: 'MatchesChannel',
-    room: id,
-    received: (match: IMatch) => {
-      return dispatch({
-        match,
-        type: "SYNC_MATCH",
-      })
-    },
-    type: undefined,
-  });
+const connectToMatch: (id: string) => (dispatch: Dispatch) => {
+  channel: string;
+  room: string;
+  type: undefined;
+  received(match: IMatch): IActionSyncMatch;
+} = (id: Id): (dispatch: Dispatch) => {
+  channel: string;
+  room: string;
+  type: undefined;
+  received(match: IMatch): IActionSyncMatch;
+} =>
+    (dispatch: Dispatch): {
+      channel: string;
+      room: string;
+      type: undefined;
+      received(match: IMatch): IActionSyncMatch;
+    } => dispatch({
+      channel: "MatchesChannel",
+      received: (match: IMatch): IActionSyncMatch => dispatch(syncMatch(match)),
+      room: id,
+      type: undefined,
+    });
 
 class MatchComponent extends React.Component<IMatchComponentProps> {
   public componentDidMount(): void {
