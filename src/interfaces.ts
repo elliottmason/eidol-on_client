@@ -25,7 +25,7 @@ export interface IActionSubmitMoveSelections extends IAction {
 }
 
 export interface IActionSyncMatch extends IAction {
-  match: IMatch;
+  match: IMatchJSON;
   type: "SYNC_MATCH";
 }
 
@@ -153,7 +153,16 @@ interface IMatchEvent {
   turn: number;
 }
 
-interface IPlayer {
+export interface IMatchJSON {
+  board?: IBoard;
+  combatants?: ICombatant[];
+  events: IMatchEvent[];
+  id?: Id;
+  players?: IPlayer[];
+  turn?: number;
+}
+
+export interface IPlayer {
   id: Id;
   isLocalPlayer: boolean;
   name: string;

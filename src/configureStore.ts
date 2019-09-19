@@ -15,13 +15,16 @@ import {
   IActionSyncMatch,
   IActionTargetBoardPosition,
   IAppState,
+  IBoard,
   ICombatant,
   Id,
   IDeployedCombatantMoveTargeting,
   IFriendlyCombatant,
   IMatchUpdatePending,
   IMoveSelection,
+  IPlayer,
   MatchContext,
+  IMatchJSON,
 } from "./interfaces";
 
 const initialState: IAppState = {
@@ -89,13 +92,20 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   state: IAppState,
   action: IActionSyncMatch,
 ): IAppState => {
-  const newCombatants: List<ICombatant> = List(
-    action.match.combatants.map((combatant: ICombatant) => ({
-      ...combatant,
-      isQueued: false,
-    })),
-  );
-  const friendlyCombatants: List<ICombatant> = newCombatants.filter(
+  const match: IMatchJSON = action.match;
+
+  let { board, id, players, turn }: IMatchJSON = match;
+
+  if (board === undefined) {
+    board = state.match.board;
+  }
+
+  const combatants: List<ICombatant> =
+    match.combatants === undefined
+      ? state.match.combatants
+      : List(match.combatants);
+
+  const friendlyCombatants: List<ICombatant> = combatants.filter(
     (combatant: ICombatant) => combatant.isFriendly,
   );
   const selectedCombatant: ICombatant = friendlyCombatants.get(
@@ -103,18 +113,33 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     nullCombatant,
   ) as IFriendlyCombatant;
 
-  const newMatchContext: MatchContext = {
+  const context: MatchContext = {
     combatantId: selectedCombatant.id,
     kind: "deployedCombatantMoveSelection",
   };
 
+  if (id === undefined) {
+    id = "0";
+  }
+
+  if (players === undefined) {
+    players = state.match.players;
+  }
+
+  if (turn === undefined) {
+    turn = state.match.turn;
+  }
+
   return {
     ...state,
     match: {
-      ...action.match,
-      combatants: newCombatants,
-      context: newMatchContext,
-      moveSelections: List(),
+      ...state.match,
+      board,
+      combatants,
+      context,
+      id,
+      players,
+      turn,
     },
   };
 };

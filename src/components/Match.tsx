@@ -9,6 +9,7 @@ import {
   IFriendlyCombatant,
   IMatch,
   MatchContext,
+  IMatchJSON,
 } from "../interfaces";
 
 import { Board } from "./Board";
@@ -26,8 +27,8 @@ export interface IMatchComponentProps extends IMatchProps {
   dispatch(func: {}): void;
 }
 
-const syncMatch: (match: IMatch) => IActionSyncMatch =
-  (match: IMatch): IActionSyncMatch => (
+const syncMatch: (match: IMatchJSON) => IActionSyncMatch =
+  (match: IMatchJSON): IActionSyncMatch => (
     {
       match,
       type: "SYNC_MATCH",
@@ -38,21 +39,21 @@ const connectToMatch: (id: string) => (dispatch: Dispatch) => {
   channel: string;
   room: string;
   type: undefined;
-  received(match: IMatch): IActionSyncMatch;
+  received(match: IMatchJSON): IActionSyncMatch;
 } = (id: Id): (dispatch: Dispatch) => {
   channel: string;
   room: string;
   type: undefined;
-  received(match: IMatch): IActionSyncMatch;
+  received(match: IMatchJSON): IActionSyncMatch;
 } =>
     (dispatch: Dispatch): {
       channel: string;
       room: string;
       type: undefined;
-      received(match: IMatch): IActionSyncMatch;
+      received(match: IMatchJSON): IActionSyncMatch;
     } => dispatch({
       channel: "MatchesChannel",
-      received: (match: IMatch): IActionSyncMatch => dispatch(syncMatch(match)),
+      received: (match: IMatchJSON): IActionSyncMatch => dispatch(syncMatch(match)),
       room: id,
       type: undefined,
     });
