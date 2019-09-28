@@ -24,7 +24,7 @@ export class Board extends React.Component<IBoardProps> {
 
   private boardDimensionSize(dimension: "x" | "y"): number {
     const coords: number[] =
-      this.props.board.positions.map(
+      this.props.positions.map(
         (position: IBoardPosition) => (position[dimension]),
       );
 
@@ -42,22 +42,22 @@ export class Board extends React.Component<IBoardProps> {
   }
 
   private renderBoardPositions(): JSX.Element[] {
-    return this.props.board.positions.map(
-      (boardPosition: IBoardPosition) => {
+    return this.props.positions.map(
+      (position: IBoardPosition) => {
         let x: number;
         let y: number;
         if (this.props.isReversed) {
-          x = this.boardWidth() - boardPosition.x;
-          y = this.boardHeight() - boardPosition.y;
+          x = this.boardWidth() - position.x;
+          y = this.boardHeight() - position.y;
         } else {
-          x = boardPosition.x;
-          y = boardPosition.y;
+          x = position.x;
+          y = position.y;
         }
 
         return (
           <BoardPosition
-            id={boardPosition.id}
-            key={boardPosition.id}
+            id={position.id}
+            key={position.id}
             x={x}
             y={y}
           />

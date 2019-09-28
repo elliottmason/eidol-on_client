@@ -8,8 +8,9 @@ import {
   Id,
   IFriendlyCombatant,
   IMatch,
-  MatchContext,
   IMatchJSON,
+  IPlayer,
+  MatchContext,
 } from "../interfaces";
 
 import { Board } from "./Board";
@@ -70,10 +71,29 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
   public render(): JSX.Element {
     return (
       <div className="Match" style={this.style()}>
-        <Board board={this.props.match.board} />
+        <Board
+          isReversed={this.isBoardReversed()}
+          positions={this.props.match.boardPositions} />
         {this.renderMenu()}
       </div >
     );
+  }
+
+  private isBoardReversed(): boolean {
+    const { players } = this.props.match;
+    const secondPlayer: IPlayer | undefined =
+      players.sort(
+        (playerA: IPlayer, playerB: IPlayer) =>
+          parseInt(playerB.id, 10) - parseInt(playerA.id, 10),
+      )[0];
+    const localPlayer: IPlayer | undefined =
+      players.find((player: IPlayer) => player.isLocalPlayer);
+
+    if (localPlayer === undefined || secondPlayer === undefined) {
+      return false;
+    }
+
+    return localPlayer.id === secondPlayer.id;
   }
 
   private renderMenu(): JSX.Element | undefined {

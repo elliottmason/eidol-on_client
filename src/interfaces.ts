@@ -44,9 +44,7 @@ export interface IMoveSelection {
   moveId: Id;
 }
 
-export interface IBoard {
-  positions: IBoardPosition[];
-}
+type Board = IBoardPosition[];
 
 export interface IBoardPosition {
   id: Id;
@@ -55,7 +53,7 @@ export interface IBoardPosition {
 }
 
 export interface IBoardProps {
-  board: IBoard;
+  positions: Board;
   isReversed: boolean;
 }
 
@@ -132,7 +130,7 @@ export type MatchContext =
   | ITurnResolution;
 
 export interface IMatch {
-  board: IBoard;
+  boardPositions: Board;
   combatants: List<ICombatant>;
   context: MatchContext;
   events: IMatchEvent[];
@@ -154,7 +152,7 @@ interface IMatchEvent {
 }
 
 export interface IMatchJSON {
-  board?: IBoard;
+  boardPositions?: Board;
   combatants?: ICombatant[];
   events: IMatchEvent[];
   id?: Id;

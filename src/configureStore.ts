@@ -15,21 +15,19 @@ import {
   IActionSyncMatch,
   IActionTargetBoardPosition,
   IAppState,
-  IBoard,
   ICombatant,
   Id,
   IDeployedCombatantMoveTargeting,
   IFriendlyCombatant,
+  IMatchJSON,
   IMatchUpdatePending,
   IMoveSelection,
-  IPlayer,
   MatchContext,
-  IMatchJSON,
 } from "./interfaces";
 
 const initialState: IAppState = {
   match: {
-    board: { positions: [] },
+    boardPositions: [],
     combatants: List(),
     context: { kind: "matchNotLoaded" },
     events: [],
@@ -94,10 +92,10 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
 ): IAppState => {
   const match: IMatchJSON = action.match;
 
-  let { board, id, players, turn }: IMatchJSON = match;
+  let { boardPositions, id, players, turn }: IMatchJSON = match;
 
-  if (board === undefined) {
-    board = state.match.board;
+  if (boardPositions === undefined) {
+    boardPositions = state.match.boardPositions;
   }
 
   const combatants: List<ICombatant> =
@@ -134,7 +132,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     ...state,
     match: {
       ...state.match,
-      board,
+      boardPositions,
       combatants,
       context,
       id,
