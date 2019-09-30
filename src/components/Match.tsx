@@ -8,6 +8,7 @@ import {
   Id,
   IFriendlyCombatant,
   IMatch,
+  IMatchesChannelJSON,
   IMatchEvent,
   IMatchJSON,
   IPlayer,
@@ -44,50 +45,59 @@ const syncMatch: (match: IMatchJSON) => IActionSyncMatch =
     }
   );
 
-const connectToMatch: (id: string) => (dispatch: Dispatch) => {
+const connectToMatch: (matchId: Id) => (dispatch: Dispatch) => {
   channel: string;
-  room: string;
+  room: Id;
   type: undefined;
-  received(match: IMatchJSON): void;
-} = (id: Id): (dispatch: Dispatch) => {
+  received(payload: IMatchesChannelJSON): void;
+} = (matchId: Id): (dispatch: Dispatch) => {
   channel: string;
-  room: string;
+  room: Id;
   type: undefined;
-  received(match: IMatchJSON): void;
+  received(payload: IMatchesChannelJSON): void;
 } =>
     (dispatch: Dispatch): {
       channel: string;
-      room: string;
+      room: Id;
       type: undefined;
-      received(match: IMatchJSON): void;
+      received(payload: IMatchesChannelJSON): void;
     } => dispatch({
       channel: "MatchesChannel",
-      received: (match: IMatchJSON): void => {
-        let matchEvents: IMatchEvent[] | undefined = match.events;
-        if (matchEvents === undefined) { matchEvents = []; }
-
+      received: (payload: IMatchesChannelJSON): void => {
+        const { match } = payload;
         let matchTurn: number | undefined = match.turn;
         if (matchTurn === undefined) { matchTurn = 1; }
-        const previousMatchTurn: number = matchTurn - 1;
 
-        const matchEventsForTurn: IMatchEvent[] = matchEvents.filter(
-          (matchEvent: IMatchEvent) => (
-            matchEvent.turn === previousMatchTurn
-          ),
-        );
+        const currentMatchTurn: number = matchTurn - 1;
+
+        let matchEventsForTurn: IMatchEvent[];
 
         const baseTimeout: number = 3000;
 
-        matchEventsForTurn.forEach((matchEvent: IMatchEvent, index: number) => {
-          const timeout: number = baseTimeout * index;
-          setTimeout(() => dispatch(playMatchEvent(matchEvent)), timeout);
-        });
+        if (payload.kind === "update") {
+          let matchEvents: IMatchEvent[] | undefined = match.events;
+          if (matchEvents === undefined) { matchEvents = []; }
 
-        const timeout: number = (matchEventsForTurn.length - 1) * baseTimeout;
+          matchEventsForTurn = matchEvents.filter(
+            (matchEvent: IMatchEvent) => (
+              matchEvent.turn === currentMatchTurn
+            ),
+          );
 
-        setTimeout(() => dispatch(syncMatch(match)), timeout);
+          matchEventsForTurn.forEach(
+            (matchEvent: IMatchEvent, index: number) => {
+              const delay: number = baseTimeout * index;
+              setTimeout(() => dispatch(playMatchEvent(matchEvent)), delay);
+            },
+          );
+        } else {
+          matchEventsForTurn = [];
+        }
+
+        const syncDelay: number = baseTimeout * matchEventsForTurn.length;
+        setTimeout(() => dispatch(syncMatch(match)), syncDelay);
       },
-      room: id,
+      room: matchId,
       type: undefined,
     });
 

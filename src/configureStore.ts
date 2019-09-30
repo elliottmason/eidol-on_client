@@ -150,20 +150,6 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   };
 };
 
-const playMatchEvent: (
-  state: IAppState,
-  action: IActionPlayMatchEvent,
-) => IAppState = (
-  state: IAppState,
-  action: IActionPlayMatchEvent,
-): IAppState => {
-  const { event } = action;
-
-  console.log(event);
-
-  return state;
-};
-
 const targetBoardPosition: (
   state: IAppState,
   action: IActionTargetBoardPosition,
@@ -182,8 +168,8 @@ const targetBoardPosition: (
       combatant.boardPositionId !== undefined,
   );
 
-  /* We haven't queued the Combatant that's using this move, so we check for 1
-     unqueued Combatant here */
+  /* We haven't yet queued the Combatant that's using this move, so we check for
+     1 unqueued Combatant here */
   if (unqueuedFriendlyCombatants.size <= 1) {
     newMatchContext = { kind: "moveSelectionConfirmation" };
   } else {
@@ -254,7 +240,7 @@ export const rootReducer: (
 ): IAppState => {
   switch (action.type) {
     case "PLAY_MATCH_EVENT":
-      return playMatchEvent(state, action);
+      return state;
     case "SELECT_MOVE":
       return selectMove(state, action);
     case "SUBMIT_MOVE_SELECTIONS":

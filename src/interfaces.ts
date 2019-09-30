@@ -157,6 +157,11 @@ export interface IMatchEvent {
   turn: number;
 }
 
+export interface IMatchesChannelJSON {
+  match: IMatchJSON;
+  kind: "initial" | "update";
+}
+
 export interface IMatchJSON {
   boardPositions?: Board;
   combatants?: ICombatant[];
@@ -172,3 +177,5 @@ export interface IPlayer {
   name: string;
   team: PlayerTeam;
 }
+
+export interface ISyncMatch {}
