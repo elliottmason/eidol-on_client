@@ -8,6 +8,7 @@ import {
   Id,
   IFriendlyCombatant,
   IMatch,
+  IMatchEvent,
   IMatchJSON,
   IPlayer,
   MatchContext,
@@ -28,6 +29,13 @@ export interface IMatchComponentProps extends IMatchProps {
   dispatch(func: {}): void;
 }
 
+const playMatchEvent = (event: IMatchEvent) => (
+  {
+    event,
+    type: "PLAY_MATCH_EVENT",
+  }
+);
+
 const syncMatch: (match: IMatchJSON) => IActionSyncMatch =
   (match: IMatchJSON): IActionSyncMatch => (
     {
@@ -40,21 +48,45 @@ const connectToMatch: (id: string) => (dispatch: Dispatch) => {
   channel: string;
   room: string;
   type: undefined;
-  received(match: IMatchJSON): IActionSyncMatch;
+  received(match: IMatchJSON): void;
 } = (id: Id): (dispatch: Dispatch) => {
   channel: string;
   room: string;
   type: undefined;
-  received(match: IMatchJSON): IActionSyncMatch;
+  received(match: IMatchJSON): void;
 } =>
     (dispatch: Dispatch): {
       channel: string;
       room: string;
       type: undefined;
-      received(match: IMatchJSON): IActionSyncMatch;
+      received(match: IMatchJSON): void;
     } => dispatch({
       channel: "MatchesChannel",
-      received: (match: IMatchJSON): IActionSyncMatch => dispatch(syncMatch(match)),
+      received: (match: IMatchJSON): void => {
+        let matchEvents: IMatchEvent[] | undefined = match.events;
+        if (matchEvents === undefined) { matchEvents = []; }
+
+        let matchTurn: number | undefined = match.turn;
+        if (matchTurn === undefined) { matchTurn = 1; }
+        const previousMatchTurn: number = matchTurn - 1;
+
+        const matchEventsForTurn: IMatchEvent[] = matchEvents.filter(
+          (matchEvent: IMatchEvent) => (
+            matchEvent.turn === previousMatchTurn
+          ),
+        );
+
+        const baseTimeout: number = 3000;
+
+        matchEventsForTurn.forEach((matchEvent: IMatchEvent, index: number) => {
+          const timeout: number = baseTimeout * index;
+          setTimeout(() => dispatch(playMatchEvent(matchEvent)), timeout);
+        });
+
+        const timeout: number = (matchEventsForTurn.length - 1) * baseTimeout;
+
+        setTimeout(() => dispatch(syncMatch(match)), timeout);
+      },
       room: id,
       type: undefined,
     });

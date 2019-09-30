@@ -6,6 +6,7 @@ type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
 
 export type Action =
+  | IActionPlayMatchEvent
   | IActionSelectMove
   | IActionSubmitMoveSelections
   | IActionSyncMatch
@@ -13,6 +14,11 @@ export type Action =
 
 export interface IAction {
   type: string;
+}
+
+export interface IActionPlayMatchEvent extends IAction {
+  event: IMatchEvent;
+  type: "PLAY_MATCH_EVENT";
 }
 
 export interface IActionSelectMove extends IAction {
@@ -53,8 +59,8 @@ export interface IBoardPosition {
 }
 
 export interface IBoardProps {
-  positions: Board;
   isReversed: boolean;
+  positions: Board;
 }
 
 export type ICombatant = IEnemyCombatant | IFriendlyCombatant;
@@ -140,7 +146,7 @@ export interface IMatch {
   turn: number;
 }
 
-interface IMatchEvent {
+export interface IMatchEvent {
   boardPositionId?: Id;
   category: MatchEventCategory;
   createdAt: Date;
@@ -154,7 +160,7 @@ interface IMatchEvent {
 export interface IMatchJSON {
   boardPositions?: Board;
   combatants?: ICombatant[];
-  events: IMatchEvent[];
+  events?: IMatchEvent[];
   id?: Id;
   players?: IPlayer[];
   turn?: number;

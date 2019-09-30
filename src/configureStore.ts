@@ -11,6 +11,7 @@ import thunk from "redux-thunk";
 import { cableMiddleware } from "./cableMiddleware";
 import {
   Action,
+  IActionPlayMatchEvent,
   IActionSelectMove,
   IActionSyncMatch,
   IActionTargetBoardPosition,
@@ -92,7 +93,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
 ): IAppState => {
   const match: IMatchJSON = action.match;
 
-  let { boardPositions, id, players, turn }: IMatchJSON = match;
+  let { boardPositions, events, id, players, turn }: IMatchJSON = match;
 
   if (boardPositions === undefined) {
     boardPositions = state.match.boardPositions;
@@ -116,9 +117,15 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     kind: "deployedCombatantMoveSelection",
   };
 
+  if (events === undefined) {
+    events = state.match.events;
+  }
+
   if (id === undefined) {
     id = "0";
   }
+
+  const moveSelections: List<IMoveSelection> = state.match.moveSelections;
 
   if (players === undefined) {
     players = state.match.players;
@@ -131,15 +138,30 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   return {
     ...state,
     match: {
-      ...state.match,
       boardPositions,
       combatants,
       context,
+      events,
       id,
+      moveSelections,
       players,
       turn,
     },
   };
+};
+
+const playMatchEvent: (
+  state: IAppState,
+  action: IActionPlayMatchEvent,
+) => IAppState = (
+  state: IAppState,
+  action: IActionPlayMatchEvent,
+): IAppState => {
+  const { event } = action;
+
+  console.log(event);
+
+  return state;
 };
 
 const targetBoardPosition: (
@@ -231,6 +253,8 @@ export const rootReducer: (
   action: Action,
 ): IAppState => {
   switch (action.type) {
+    case "PLAY_MATCH_EVENT":
+      return playMatchEvent(state, action);
     case "SELECT_MOVE":
       return selectMove(state, action);
     case "SUBMIT_MOVE_SELECTIONS":
