@@ -6,7 +6,6 @@ import {
   IActionSyncMatch,
   ICombatant,
   Id,
-  IFriendlyCombatant,
   IMatch,
   IMatchesChannelJSON,
   IMatchEvent,
@@ -151,7 +150,7 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
         if (combatant !== undefined) {
           return (
             <MoveSelectionMenu
-              combatant={combatant as IFriendlyCombatant}
+              combatant={combatant}
             />
           );
         }

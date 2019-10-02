@@ -10,8 +10,7 @@ import {
   MatchContext,
 } from "../interfaces";
 
-import { EnemyCombatant } from "./EnemyCombatant";
-import { FriendlyCombatant } from "./FriendlyCombatant";
+import { Combatant } from "./Combatant";
 
 interface IBoardPositionProps {
   id: string;
@@ -64,23 +63,12 @@ class BoardPositionComponent
 
   private renderOccupants(): List<JSX.Element> {
     const occupants: List<JSX.Element> = this.props.occupants.map(
-      (combatant: ICombatant) => {
-        if (combatant.isFriendly) {
-          return (
-            <FriendlyCombatant
-              key={combatant.id}
-              combatant={combatant}
-            />
-          );
-        }
-
-        return (
-          <EnemyCombatant
-            key={combatant.id}
-            combatant={combatant}
-          />
-        );
-      },
+      (combatant: ICombatant) => (
+        <Combatant
+          key={combatant.id}
+          combatant={combatant}
+        />
+      ),
     );
 
     return occupants;

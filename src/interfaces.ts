@@ -6,7 +6,7 @@ type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
 
 export type Action =
-  | IActionPlayMatchEvent
+  | IActionDecrementCombatantHealth
   | IActionSelectMove
   | IActionSubmitMoveSelections
   | IActionSyncMatch
@@ -16,9 +16,8 @@ export interface IAction {
   type: string;
 }
 
-export interface IActionPlayMatchEvent extends IAction {
-  event: IMatchEvent;
-  type: "PLAY_MATCH_EVENT";
+export interface IActionDecrementCombatantHealth {
+  type: "DECREMENT_COMBATANT_HEALTH";
 }
 
 export interface IActionSelectMove extends IAction {
@@ -63,25 +62,18 @@ export interface IBoardProps {
   positions: Board;
 }
 
-export type ICombatant = IEnemyCombatant | IFriendlyCombatant;
-
 interface IMatchCombatant {
   boardPositionId?: Id;
   id: Id;
   name: string;
 }
 
-export interface IFriendlyCombatant extends IMatchCombatant {
+export interface ICombatant extends IMatchCombatant {
   isFriendly: true;
   isQueued: boolean;
   maximumHealth: number;
   moves: IMove[];
   remainingHealth: number;
-}
-
-export interface IEnemyCombatant extends IMatchCombatant {
-  isFriendly: false;
-  remainingHealthPercentage: number;
 }
 
 export interface IMove {
@@ -147,6 +139,7 @@ export interface IMatch {
 }
 
 export interface IMatchEvent {
+  amount: number;
   boardPositionId?: Id;
   category: MatchEventCategory;
   createdAt: Date;
@@ -158,8 +151,8 @@ export interface IMatchEvent {
 }
 
 export interface IMatchesChannelJSON {
-  match: IMatchJSON;
   kind: "initial" | "update";
+  match: IMatchJSON;
 }
 
 export interface IMatchJSON {
@@ -177,5 +170,3 @@ export interface IPlayer {
   name: string;
   team: PlayerTeam;
 }
-
-export interface ISyncMatch {}

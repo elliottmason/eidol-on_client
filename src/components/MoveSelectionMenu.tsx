@@ -1,11 +1,11 @@
 import React from "react";
 
-import { IFriendlyCombatant, IMove } from "../interfaces";
+import { ICombatant, IMove } from "../interfaces";
 
 import { MoveSelectionMenuItem } from "./MoveSelectionMenuItem";
 
 interface IMoveSelectionMenuProps {
-  combatant: IFriendlyCombatant;
+  combatant: ICombatant;
 }
 
 export class MoveSelectionMenu extends React.Component<IMoveSelectionMenuProps> {

@@ -11,7 +11,6 @@ import thunk from "redux-thunk";
 import { cableMiddleware } from "./cableMiddleware";
 import {
   Action,
-  IActionPlayMatchEvent,
   IActionSelectMove,
   IActionSyncMatch,
   IActionTargetBoardPosition,
@@ -19,7 +18,7 @@ import {
   ICombatant,
   Id,
   IDeployedCombatantMoveTargeting,
-  IFriendlyCombatant,
+  IMatch,
   IMatchJSON,
   IMatchUpdatePending,
   IMoveSelection,
@@ -39,7 +38,7 @@ const initialState: IAppState = {
   },
 };
 
-const nullCombatant: IFriendlyCombatant = {
+const nullCombatant: ICombatant = {
   id: "0",
   isFriendly: true,
   isQueued: false,
@@ -110,7 +109,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   const selectedCombatant: ICombatant = friendlyCombatants.get(
     0,
     nullCombatant,
-  ) as IFriendlyCombatant;
+  );
 
   const context: MatchContext = {
     combatantId: selectedCombatant.id,
@@ -239,7 +238,7 @@ export const rootReducer: (
   action: Action,
 ): IAppState => {
   switch (action.type) {
-    case "PLAY_MATCH_EVENT":
+    case "DECREMENT_COMBATANT_HEALTH":
       return state;
     case "SELECT_MOVE":
       return selectMove(state, action);

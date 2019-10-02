@@ -5,11 +5,7 @@ interface IIndexProps {
 }
 
 export class Index extends React.Component<IIndexProps> {
-  public render(): JSX.Element {
-    return (
-      <div>
-        <button>Find A Match</button>
-      </div>
-    );
-  }
+  public static render = (): JSX.Element => (
+    <div />
+  )
 }

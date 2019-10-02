@@ -29,6 +29,7 @@
         "ignore-pattern": "/rxjs.*/"
       }
     ],
+    "no-inferrable-types": false,
     "variable-name": [
       true,
       "ban-keywords",
