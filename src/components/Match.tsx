@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
+  IActionPlayMatchEvent,
   IActionSyncMatch,
   ICombatant,
   Id,
@@ -29,12 +30,14 @@ export interface IMatchComponentProps extends IMatchProps {
   dispatch(func: {}): void;
 }
 
-const playMatchEvent = (event: IMatchEvent) => (
-  {
-    event,
-    type: "PLAY_MATCH_EVENT",
-  }
-);
+const playMatchEvent:
+  (event: IMatchEvent) => IActionPlayMatchEvent =
+  (event: IMatchEvent): IActionPlayMatchEvent => (
+    {
+      event,
+      type: "PLAY_MATCH_EVENT",
+    }
+  );
 
 const syncMatch: (match: IMatchJSON) => IActionSyncMatch =
   (match: IMatchJSON): IActionSyncMatch => (

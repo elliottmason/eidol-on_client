@@ -1,12 +1,11 @@
 import { List } from "immutable";
 
 export type Id = string;
-type MatchEventCategory = "damage" | "relocation";
 type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
 
 export type Action =
-  | IActionDecrementCombatantHealth
+  | IActionPlayMatchEvent
   | IActionSelectMove
   | IActionSubmitMoveSelections
   | IActionSyncMatch
@@ -16,8 +15,9 @@ export interface IAction {
   type: string;
 }
 
-export interface IActionDecrementCombatantHealth {
-  type: "DECREMENT_COMBATANT_HEALTH";
+export interface IActionPlayMatchEvent {
+  event: IMatchEvent;
+  type: "PLAY_MATCH_EVENT";
 }
 
 export interface IActionSelectMove extends IAction {
@@ -139,15 +139,21 @@ export interface IMatch {
 }
 
 export interface IMatchEvent {
-  amount: number;
+  amount?: number;
   boardPositionId?: Id;
-  category: MatchEventCategory;
+  category: string;
   createdAt: Date;
   description: string;
   id: Id;
   matchCombatantId?: Id;
   property: MatchEventProperty;
   turn: number;
+}
+
+export interface IMatchEventDamage extends IMatchEvent {
+  amount: number;
+  category: "damage";
+  matchCombatantId: Id;
 }
 
 export interface IMatchesChannelJSON {

@@ -7,7 +7,8 @@ interface IHealthBarProps {
 }
 
 interface IHealthBarState {
-  displayRemainingHealthPercentage: number;
+  maximumHealth: number;
+  remainingHealth: number;
 }
 
 const centurn: number = 100;
@@ -16,39 +17,52 @@ export class HealthBar
   extends React.Component<IHealthBarProps, IHealthBarState> {
 
   public readonly state: IHealthBarState = {
-    displayRemainingHealthPercentage:
-      Math.ceil(
-        this.props.remainingHealth / this.props.maximumHealth *
-        centurn,
-      ),
+    maximumHealth: this.props.maximumHealth,
+    remainingHealth: this.props.remainingHealth,
   };
+
+  public componentDidUpdate(): void {
+    const interval: number = 50;
+
+    if (this.state.remainingHealth > this.props.remainingHealth) {
+      setTimeout(
+        () => {
+          this.setState({ remainingHealth: this.state.remainingHealth - 1 });
+        },
+        interval,
+      );
+    } else if (this.state.remainingHealth < this.props.remainingHealth) {
+      setTimeout(
+        () => {
+          this.setState({ remainingHealth: this.state.remainingHealth + 1 });
+        },
+        interval,
+      );
+    }
+  }
 
   public render(): JSX.Element {
     return (
       <div
         style={this.containerStyle()}
       >
-        <div style={this.innerStyle()} >
+        <div style={this.healthBarStyle()} />
+        <span style={this.healthValuesStyle()} >
           {this.healthValues()}
-        </div>
+        </span>
       </div>
     );
   }
 
-  private healthValues(): string | undefined {
-    if (!this.props.isFriendly) { return undefined; }
-
-    if ("maximumHealth" in this.props && "remainingHealth" in this.props) {
-      const { maximumHealth, remainingHealth }: {
-        maximumHealth: number;
-        remainingHealth: number;
-      } =
-        this.props;
-
-      return `${remainingHealth} / ${maximumHealth}`;
-    }
-  }
-
+  // public shouldComponentUpdate(
+  //   nextProps: IHealthBarProps,
+  //   nextState: IHealthBarState,
+  // ): boolean {
+  //   return (
+  //     nextState.remainingHealth !==
+  //     this.state.remainingHealth
+  //   );
+  // }
 
   private readonly containerStyle = (): CSSProperties =>
     (
@@ -57,37 +71,57 @@ export class HealthBar
         boxSizing: "border-box",
         height: "11%",
         margin: "4%",
+        position: "relative",
         width: "92%",
       }
     )
 
-  private readonly innerStyle = (): CSSProperties => (
+  private readonly healthBarStyle = (): CSSProperties => (
     {
       backgroundColor: "green",
       color: "white",
       height: "100%",
-      width: `${this.state.displayRemainingHealthPercentage}%`,
+      width: `${this.remainingHealthPercentage()}%`,
     }
   )
 
-  // private remainingHealthPercentage(): number {
-  //   if ("remainingHealthPercentage" in this.props) {
-  //     return this.props.remainingHealthPercentage;
-  //   }
+  private healthValues(): string | undefined {
+    if (!this.props.isFriendly) { return undefined; }
 
-  //   if ("maximumHealth" in this.props && "remainingHealth" in this.props) {
-  //     const { maximumHealth, remainingHealth }: {
-  //       maximumHealth: number;
-  //       remainingHealth: number;
-  //     } =
-  //       this.props;
-  //     const centurn: number = 100;
-  //     const percentage: number =
-  //       Math.round(maximumHealth / remainingHealth * centurn);
+    if (
+      "maximumHealth" in this.props &&
+      "remainingHealth" in this.props
+    ) {
+      const { maximumHealth, remainingHealth }: {
+        maximumHealth: number;
+        remainingHealth: number;
+      } =
+        this.state;
 
-  //     return percentage;
-  //   }
+      return `${remainingHealth} / ${maximumHealth}`;
+    }
+  }
 
-  //   return 0;
-  // }
+  private readonly healthValuesStyle = (): CSSProperties => (
+    {
+      color: "white",
+      display: "block",
+      fontSize: "2vh",
+      fontWeight: "bold",
+      left: 0,
+      position: "absolute",
+      textShadow: "-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black",
+      top: 0,
+      verticalAlign: "middle",
+      width: "100%",
+    }
+  )
+
+  private remainingHealthPercentage(): number {
+    return (
+      Math.ceil(
+        (this.state.remainingHealth / this.state.maximumHealth) * centurn,
+      )
+    );
+  }
 }

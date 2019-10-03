@@ -23,6 +23,8 @@ import {
   IMatchUpdatePending,
   IMoveSelection,
   MatchContext,
+  IActionPlayMatchEvent,
+  IMatchEventDamage,
 } from "./interfaces";
 
 const initialState: IAppState = {
@@ -149,6 +151,53 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   };
 };
 
+const playMatchEvent: (
+  state: IAppState,
+  action: IActionPlayMatchEvent,
+) => IAppState = (
+  state: IAppState,
+  action: IActionPlayMatchEvent,
+): IAppState => {
+  switch (action.event.category) {
+    case "damage":
+      const event: IMatchEventDamage = action.event as IMatchEventDamage;
+      const combatantId: string = event.matchCombatantId;
+      const oldCombatants: List<ICombatant> = state.match.combatants;
+      const oldCombatantIndex: number = oldCombatants.findIndex(
+        (combatant: ICombatant) => combatant.id === combatantId,
+      );
+      const oldCombatant: ICombatant | undefined = oldCombatants.get(
+        oldCombatantIndex,
+      );
+
+      if (oldCombatant !== undefined) {
+        const remainingHealth: number =
+          oldCombatant.remainingHealth - event.amount;
+        const newCombatant: ICombatant = {
+          ...oldCombatant,
+          remainingHealth,
+        };
+        const combatants: List<ICombatant> = oldCombatants.splice(
+          oldCombatantIndex,
+          1,
+          newCombatant,
+        );
+
+        return {
+          ...state,
+          match: {
+            ...state.match,
+            combatants,
+          },
+        };
+      }
+
+      return state;
+    default:
+      return state;
+  }
+};
+
 const targetBoardPosition: (
   state: IAppState,
   action: IActionTargetBoardPosition,
@@ -238,8 +287,8 @@ export const rootReducer: (
   action: Action,
 ): IAppState => {
   switch (action.type) {
-    case "DECREMENT_COMBATANT_HEALTH":
-      return state;
+    case "PLAY_MATCH_EVENT":
+      return playMatchEvent(state, action);
     case "SELECT_MOVE":
       return selectMove(state, action);
     case "SUBMIT_MOVE_SELECTIONS":
