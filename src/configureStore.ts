@@ -11,6 +11,8 @@ import thunk from "redux-thunk";
 import { cableMiddleware } from "./cableMiddleware";
 import {
   Action,
+  IActionPlayMatchEvent,
+  IActionSelectCombatantForDeployment,
   IActionSelectMove,
   IActionSyncMatch,
   IActionTargetBoardPosition,
@@ -18,13 +20,11 @@ import {
   ICombatant,
   Id,
   IDeployedCombatantMoveTargeting,
-  IMatch,
+  IMatchEventDamage,
   IMatchJSON,
   IMatchUpdatePending,
   IMoveSelection,
   MatchContext,
-  IActionPlayMatchEvent,
-  IMatchEventDamage,
 } from "./interfaces";
 
 const initialState: IAppState = {
@@ -108,15 +108,40 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   const friendlyCombatants: List<ICombatant> = combatants.filter(
     (combatant: ICombatant) => combatant.isFriendly,
   );
-  const selectedCombatant: ICombatant = friendlyCombatants.get(
+
+  const benchedFriendlyCombatants: List<ICombatant> = friendlyCombatants.filter(
+    (combatant: ICombatant) =>
+      combatant.boardPositionId === null ||
+      combatant.boardPositionId === undefined,
+  );
+
+  const deployedFriendlyCombatants: List<
+    ICombatant
+  > = friendlyCombatants.filter(
+    (combatant: ICombatant) =>
+      combatant.boardPositionId !== null &&
+      combatant.boardPositionId !== undefined,
+  );
+
+  const selectedCombatant: ICombatant = deployedFriendlyCombatants.get(
     0,
     nullCombatant,
   );
 
-  const context: MatchContext = {
-    combatantId: selectedCombatant.id,
-    kind: "deployedCombatantMoveSelection",
-  };
+  let context: MatchContext;
+
+  const deployedCombatantMax: number = 2;
+
+  if (deployedFriendlyCombatants.size === deployedCombatantMax) {
+    context = {
+      combatantId: selectedCombatant.id,
+      kind: "deployedCombatantMoveSelection",
+    };
+  } else {
+    context = {
+      kind: "benchedCombatantSelection",
+    };
+  }
 
   if (events === undefined) {
     events = state.match.events;
@@ -196,6 +221,27 @@ const playMatchEvent: (
     default:
       return state;
   }
+};
+
+const selectCombatantForDeployment: (
+  state: IAppState,
+  action: IActionSelectCombatantForDeployment,
+) => IAppState = (
+  state: IAppState,
+  action: IActionSelectCombatantForDeployment,
+): IAppState => {
+  const context: MatchContext = {
+    combatantId: action.combatantId,
+    kind: "benchedCombatantPlacement",
+  };
+
+  return {
+    ...state,
+    match: {
+      ...state.match,
+      context,
+    },
+  };
 };
 
 const targetBoardPosition: (
@@ -289,6 +335,8 @@ export const rootReducer: (
   switch (action.type) {
     case "PLAY_MATCH_EVENT":
       return playMatchEvent(state, action);
+    case "SELECT_COMBATANT_FOR_DEPLOYMENT":
+      return selectCombatantForDeployment(state, action);
     case "SELECT_MOVE":
       return selectMove(state, action);
     case "SUBMIT_MOVE_SELECTIONS":

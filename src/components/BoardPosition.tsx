@@ -3,6 +3,7 @@ import React, { CSSProperties } from "react";
 import { connect } from "react-redux";
 
 import {
+  IActionDeployBenchedCombatant,
   IActionTargetBoardPosition,
   IAppState,
   ICombatant,
@@ -23,6 +24,15 @@ interface IBoardPositionComponentProps extends IBoardPositionProps {
   occupants: List<ICombatant>;
   dispatch(func: {}): void;
 }
+
+const deploySelectedBenchedCombatant: (boardPositionId: Id) =>
+  IActionDeployBenchedCombatant =
+  (boardPositionId: Id): IActionDeployBenchedCombatant => (
+    {
+      boardPositionId,
+      type: "DEPLOY_BENCHED_COMBATANT",
+    }
+  );
 
 const targetPosition: (boardPositionId: Id) => IActionTargetBoardPosition =
   (boardPositionId: Id): IActionTargetBoardPosition => (
@@ -53,6 +63,9 @@ class BoardPositionComponent
     const { dispatch } = this.props;
 
     switch (this.props.matchContext.kind) {
+      case "benchedCombatantPlacement":
+        dispatch(deploySelectedBenchedCombatant(this.props.id));
+        break;
       case "deployedCombatantMoveTargeting":
         dispatch(targetPosition(this.props.id));
         break;

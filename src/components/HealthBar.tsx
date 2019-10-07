@@ -54,16 +54,6 @@ export class HealthBar
     );
   }
 
-  // public shouldComponentUpdate(
-  //   nextProps: IHealthBarProps,
-  //   nextState: IHealthBarState,
-  // ): boolean {
-  //   return (
-  //     nextState.remainingHealth !==
-  //     this.state.remainingHealth
-  //   );
-  // }
-
   private readonly containerStyle = (): CSSProperties =>
     (
       {
@@ -119,7 +109,7 @@ export class HealthBar
 
   private remainingHealthPercentage(): number {
     return (
-      Math.ceil(
+      Math.round(
         (this.state.remainingHealth / this.state.maximumHealth) * centurn,
       )
     );

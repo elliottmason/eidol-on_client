@@ -7,7 +7,7 @@ import {
   IActionSubmitMoveSelections,
   Id,
   IMoveSelection,
-} from "../interfaces";
+} from "../../interfaces";
 
 interface IMoveSelectionConfirmationMenuProps {
   moveSelections: List<IMoveSelection>;

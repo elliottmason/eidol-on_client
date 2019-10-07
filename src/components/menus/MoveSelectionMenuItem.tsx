@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { IActionSelectMove, IMove } from "../interfaces";
+import { IActionSelectMove, IMove } from "../../interfaces";
 
 interface IMoveSelectionMenuItemProps {
   move: IMove;

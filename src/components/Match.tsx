@@ -1,3 +1,4 @@
+import { List } from "immutable";
 import React, { CSSProperties } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -16,8 +17,9 @@ import {
 } from "../interfaces";
 
 import { Board } from "./Board";
-import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu";
-import { MoveSelectionMenu } from "./MoveSelectionMenu";
+import { BenchedCombatantSelectionMenu } from "./menus/BenchedCombatantSelectionMenu";
+import { MoveSelectionConfirmationMenu } from "./menus/MoveSelectionConfirmationMenu";
+import { MoveSelectionMenu } from "./menus/MoveSelectionMenu";
 
 interface IMatchProps {
   context?: MatchContext;
@@ -117,9 +119,10 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
       <div className="Match" style={this.style()}>
         <Board
           isReversed={this.isBoardReversed()}
-          positions={this.props.match.boardPositions} />
+          positions={this.props.match.boardPositions}
+        />
         {this.renderMenu()}
-      </div >
+      </div>
     );
   }
 
@@ -142,6 +145,21 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
 
   private renderMenu(): JSX.Element | undefined {
     switch (this.props.match.context.kind) {
+      case ("benchedCombatantSelection"):
+        const benchedFriendlyCombatants: List<ICombatant> =
+          this.props.match.combatants.filter(
+            (combatant: ICombatant) =>
+              combatant.isFriendly && (
+                combatant.boardPositionId === null ||
+                combatant.boardPositionId === undefined
+              ),
+          );
+
+        return (
+          <BenchedCombatantSelectionMenu
+            combatants={benchedFriendlyCombatants}
+          />
+        )
       case ("deployedCombatantMoveSelection"):
         const combatantId: string = this.props.match.context.combatantId;
         const combatant: ICombatant | undefined =
@@ -172,7 +190,7 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
 
   private readonly style = (): CSSProperties => (
     {
-      alignItems: "center",
+      alignItems: "flex-start",
       display: "flex",
       height: "100%",
       justifyContent: "center",

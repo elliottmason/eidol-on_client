@@ -1,11 +1,15 @@
 import { List } from "immutable";
 
 export type Id = string;
+
 type MatchEventProperty = "normal";
+
 type PlayerTeam = 1 | 2;
 
 export type Action =
+  | IActionDeployBenchedCombatant
   | IActionPlayMatchEvent
+  | IActionSelectCombatantForDeployment
   | IActionSelectMove
   | IActionSubmitMoveSelections
   | IActionSyncMatch
@@ -15,9 +19,19 @@ export interface IAction {
   type: string;
 }
 
+export interface IActionDeployBenchedCombatant {
+  boardPositionId: Id;
+  type: "DEPLOY_BENCHED_COMBATANT";
+}
+
 export interface IActionPlayMatchEvent {
   event: IMatchEvent;
   type: "PLAY_MATCH_EVENT";
+}
+
+export interface IActionSelectCombatantForDeployment {
+  combatantId: Id;
+  type: "SELECT_COMBATANT_FOR_DEPLOYMENT";
 }
 
 export interface IActionSelectMove extends IAction {
@@ -63,7 +77,7 @@ export interface IBoardProps {
 }
 
 interface IMatchCombatant {
-  boardPositionId?: Id;
+  boardPositionId?: Id | null;
   id: Id;
   name: string;
 }
