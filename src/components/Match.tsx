@@ -17,9 +17,7 @@ import {
 } from "../interfaces";
 
 import { Board } from "./Board";
-import { BenchedCombatantSelectionMenu } from "./menus/BenchedCombatantSelectionMenu";
-import { MoveSelectionConfirmationMenu } from "./menus/MoveSelectionConfirmationMenu";
-import { MoveSelectionMenu } from "./menus/MoveSelectionMenu";
+import { MatchMenu } from "./menus/MatchMenu";
 
 interface IMatchProps {
   context?: MatchContext;
@@ -115,13 +113,16 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
   }
 
   public render(): JSX.Element {
+    const { match } = this.props;
+    const { boardPositions } = match;
+
     return (
       <div className="Match" style={this.style()}>
         <Board
           isReversed={this.isBoardReversed()}
-          positions={this.props.match.boardPositions}
+          positions={boardPositions}
         />
-        {this.renderMenu()}
+        <MatchMenu match={match} />
       </div>
     );
   }
@@ -141,51 +142,6 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
     }
 
     return localPlayer.id === secondPlayer.id;
-  }
-
-  private renderMenu(): JSX.Element | undefined {
-    switch (this.props.match.context.kind) {
-      case ("benchedCombatantSelection"):
-        const benchedFriendlyCombatants: List<ICombatant> =
-          this.props.match.combatants.filter(
-            (combatant: ICombatant) =>
-              combatant.isFriendly && (
-                combatant.boardPositionId === null ||
-                combatant.boardPositionId === undefined
-              ),
-          );
-
-        return (
-          <BenchedCombatantSelectionMenu
-            combatants={benchedFriendlyCombatants}
-          />
-        )
-      case ("deployedCombatantMoveSelection"):
-        const combatantId: string = this.props.match.context.combatantId;
-        const combatant: ICombatant | undefined =
-          this.props.match.combatants.find(
-            (potentialCombatant: ICombatant) =>
-              (potentialCombatant.id === combatantId),
-          );
-
-        if (combatant !== undefined) {
-          return (
-            <MoveSelectionMenu
-              combatant={combatant}
-            />
-          );
-        }
-        break;
-      case ("moveSelectionConfirmation"):
-
-        return (
-          <MoveSelectionConfirmationMenu
-            moveSelections={this.props.match.moveSelections}
-          />
-        );
-      default:
-        return undefined;
-    }
   }
 
   private readonly style = (): CSSProperties => (

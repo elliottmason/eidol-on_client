@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "react-redux"
+import { connect } from "react-redux";
 
 import {
   IActionSelectCombatantForDeployment,
@@ -9,6 +9,7 @@ import {
 
 interface IBenchedCombatantSelectionMenuItemProps {
   combatant: ICombatant;
+  isSelected: boolean;
 }
 
 interface IBenchedCombatantSelectionMenuItemComponentProps
@@ -33,6 +34,7 @@ class BenchedCombatantSelectionMenuItemComponent
   public render(): JSX.Element {
     return (
       <button
+        disabled={this.props.isSelected}
         key={this.props.combatant.id}
         onClick={this.selectCombatantForDeployment}
         style={{ display: "block" }}

@@ -85,6 +85,7 @@ interface IMatchCombatant {
 export interface ICombatant extends IMatchCombatant {
   isFriendly: true;
   isQueued: boolean;
+  isSelectedForDeployment: boolean;
   maximumHealth: number;
   moves: IMove[];
   remainingHealth: number;
@@ -104,7 +105,7 @@ interface IBenchedCombatantSelection {
   kind: "benchedCombatantSelection";
 }
 
-interface IDeployedCombatantMoveSelection {
+export interface IDeployedCombatantMoveSelection {
   combatantId: Id;
   kind: "deployedCombatantMoveSelection";
 }

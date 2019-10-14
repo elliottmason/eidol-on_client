@@ -1,0 +1,79 @@
+import { List } from "immutable";
+import React from "react";
+
+import {
+  ICombatant,
+  IDeployedCombatantMoveSelection,
+  IMatch,
+  MatchContext,
+} from "../../interfaces";
+
+import { BenchedCombatantSelectionMenu } from "./BenchedCombatantSelectionMenu";
+import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu";
+import { MoveSelectionMenu } from "./MoveSelectionMenu";
+
+interface IMatchMenuProps {
+  match: IMatch;
+}
+
+export class MatchMenu extends React.Component<IMatchMenuProps> {
+  public render(): JSX.Element {
+    switch (this.props.match.context.kind) {
+      case ("benchedCombatantPlacement"):
+      case ("benchedCombatantSelection"):
+        return this.renderBenchedCombatantSelectionMenu();
+      case ("deployedCombatantMoveSelection"):
+        return this.renderMoveSelectionMenu();
+      case ("moveSelectionConfirmation"):
+        return this.renderMoveSelectionConfirmationMenu();
+      default:
+        return <div />;
+    }
+  }
+
+  private renderBenchedCombatantSelectionMenu(): JSX.Element {
+    const benchedFriendlyCombatants: List<ICombatant> =
+      this.props.match.combatants.filter(
+        (combatant: ICombatant) =>
+          combatant.isFriendly && (
+            combatant.boardPositionId === null ||
+            combatant.boardPositionId === undefined
+          ),
+      );
+
+    return (
+      <BenchedCombatantSelectionMenu
+        combatants={benchedFriendlyCombatants}
+      />
+    );
+  }
+
+  private renderMoveSelectionConfirmationMenu(): JSX.Element {
+    return (
+      <MoveSelectionConfirmationMenu
+        moveSelections={this.props.match.moveSelections}
+      />
+    );
+  }
+
+  private renderMoveSelectionMenu(): JSX.Element {
+    const matchContext: MatchContext = this.props.match.context;
+    const combatantId: string =
+      (matchContext as IDeployedCombatantMoveSelection).combatantId;
+    const combatant: ICombatant | undefined =
+      this.props.match.combatants.find(
+        (potentialCombatant: ICombatant) =>
+          (potentialCombatant.id === combatantId),
+      );
+
+    if (combatant !== undefined) {
+      return (
+        <MoveSelectionMenu
+          combatant={combatant}
+        />
+      );
+    }
+
+    return <div />;
+  }
+}

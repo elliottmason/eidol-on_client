@@ -11,6 +11,7 @@ import thunk from "redux-thunk";
 import { cableMiddleware } from "./cableMiddleware";
 import {
   Action,
+  IActionDeployBenchedCombatant,
   IActionPlayMatchEvent,
   IActionSelectCombatantForDeployment,
   IActionSelectMove,
@@ -20,6 +21,7 @@ import {
   ICombatant,
   Id,
   IDeployedCombatantMoveTargeting,
+  IMatch,
   IMatchEventDamage,
   IMatchJSON,
   IMatchUpdatePending,
@@ -40,14 +42,89 @@ const initialState: IAppState = {
   },
 };
 
+const maxDeployedFriendlyCombatants: number = 2;
+
 const nullCombatant: ICombatant = {
   id: "0",
   isFriendly: true,
   isQueued: false,
+  isSelectedForDeployment: false,
   maximumHealth: 0,
   moves: [],
   name: "Eidol",
   remainingHealth: 0,
+};
+
+const deployBenchedCombatant: (
+  state: IAppState,
+  action: IActionDeployBenchedCombatant,
+) => IAppState = (
+  state: IAppState,
+  action: IActionDeployBenchedCombatant,
+): IAppState => {
+  const { boardPositionId }: { boardPositionId: Id } = action;
+  const oldMatch: IMatch = state.match;
+  const oldCombatants: List<ICombatant> = oldMatch.combatants;
+
+  let combatantId: Id;
+  if (oldMatch.context.kind === "benchedCombatantPlacement") {
+    combatantId = oldMatch.context.combatantId;
+  }
+
+  const combatantIndex: number = oldCombatants.findIndex(
+    (combatant: ICombatant) => combatant.id === combatantId,
+  );
+
+  const oldCombatant: ICombatant = oldCombatants.get(
+    combatantIndex,
+    nullCombatant,
+  );
+
+  const newCombatant: ICombatant = {
+    ...oldCombatant,
+    boardPositionId,
+  };
+
+  const combatants: List<ICombatant> = oldCombatants.splice(
+    combatantIndex,
+    1,
+    newCombatant,
+  );
+
+  const friendlyCombatants: List<ICombatant> = combatants.filter(
+    (combatant: ICombatant) => combatant.isFriendly,
+  );
+
+  const benchedFriendlyCombatants: List<ICombatant> = friendlyCombatants.filter(
+    (combatant: ICombatant) =>
+      combatant.boardPositionId === null ||
+      combatant.boardPositionId === undefined,
+  );
+
+  const deployedFriendlyCombatants: List<
+    ICombatant
+  > = friendlyCombatants.filter(
+    (combatant: ICombatant) =>
+      combatant.boardPositionId !== null &&
+      combatant.boardPositionId !== undefined,
+  );
+
+  const isDeploymentFinished: boolean =
+    deployedFriendlyCombatants.size === maxDeployedFriendlyCombatants ||
+    benchedFriendlyCombatants.size === 0;
+
+  const context: MatchContext = isDeploymentFinished
+    ? { kind: "matchUpdatePending" }
+    : { kind: "benchedCombatantSelection" };
+
+  return {
+    ...state,
+    match: {
+      ...state.match,
+      combatants,
+      context,
+    },
+  };
 };
 
 const selectMove: (state: IAppState, action: IActionSelectMove) => IAppState = (
@@ -230,15 +307,32 @@ const selectCombatantForDeployment: (
   state: IAppState,
   action: IActionSelectCombatantForDeployment,
 ): IAppState => {
+  const { combatantId } = action;
   const context: MatchContext = {
-    combatantId: action.combatantId,
+    combatantId,
     kind: "benchedCombatantPlacement",
   };
+
+  const oldCombatants: List<ICombatant> = state.match.combatants;
+  const oldCombatantIndex: number = oldCombatants.findIndex(
+    (combatant: ICombatant) => combatant.id === combatantId,
+  );
+  const oldCombatant: ICombatant | undefined = oldCombatants.get(
+    oldCombatantIndex,
+  );
+
+  const combatants: List<ICombatant> = oldCombatants.map(
+    (combatant: ICombatant) => ({
+      ...combatant,
+      isSelectedForDeployment: combatant.id === combatantId,
+    }),
+  );
 
   return {
     ...state,
     match: {
       ...state.match,
+      combatants,
       context,
     },
   };
@@ -333,6 +427,8 @@ export const rootReducer: (
   action: Action,
 ): IAppState => {
   switch (action.type) {
+    case "DEPLOY_BENCHED_COMBATANT":
+      return deployBenchedCombatant(state, action);
     case "PLAY_MATCH_EVENT":
       return playMatchEvent(state, action);
     case "SELECT_COMBATANT_FOR_DEPLOYMENT":
