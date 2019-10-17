@@ -59,15 +59,21 @@ const submitMoveSelections:
     });
   };
 
-const confirmMoveSelections = (moveSelections: List<IMoveSelection>) => (
-  (dispatch: Dispatch) => (
-    submitMoveSelections(moveSelections)
-      .then(
-        (response: Response) => dispatch(awaitMatchUpdate()),
-        (error) => console.error(error),
+const confirmMoveSelections:
+  (moveSelections: List<IMoveSelection>) =>
+    (dispatch: Dispatch) =>
+      Promise<void> =
+  (moveSelections: List<IMoveSelection>):
+    (dispatch: Dispatch) => Promise<void> => (
+      (dispatch: Dispatch): Promise<void> => (
+        submitMoveSelections(moveSelections)
+          .then(
+            (response: Response): void => {
+              dispatch(awaitMatchUpdate());
+            },
+          )
       )
-  )
-);
+    );
 
 class MoveSelectionConfirmationMenuComponent
   extends React.Component<IMoveSelectionConfirmationMenuComponentProps> {

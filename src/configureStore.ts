@@ -114,7 +114,7 @@ const deployBenchedCombatant: (
     benchedFriendlyCombatants.size === 0;
 
   const context: MatchContext = isDeploymentFinished
-    ? { kind: "matchUpdatePending" }
+    ? { kind: "combatantDeploymentConfirmation" }
     : { kind: "benchedCombatantSelection" };
 
   return {
@@ -184,12 +184,6 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
 
   const friendlyCombatants: List<ICombatant> = combatants.filter(
     (combatant: ICombatant) => combatant.isFriendly,
-  );
-
-  const benchedFriendlyCombatants: List<ICombatant> = friendlyCombatants.filter(
-    (combatant: ICombatant) =>
-      combatant.boardPositionId === null ||
-      combatant.boardPositionId === undefined,
   );
 
   const deployedFriendlyCombatants: List<
@@ -314,13 +308,6 @@ const selectCombatantForDeployment: (
   };
 
   const oldCombatants: List<ICombatant> = state.match.combatants;
-  const oldCombatantIndex: number = oldCombatants.findIndex(
-    (combatant: ICombatant) => combatant.id === combatantId,
-  );
-  const oldCombatant: ICombatant | undefined = oldCombatants.get(
-    oldCombatantIndex,
-  );
-
   const combatants: List<ICombatant> = oldCombatants.map(
     (combatant: ICombatant) => ({
       ...combatant,
@@ -357,7 +344,7 @@ const targetBoardPosition: (
   );
 
   /* We haven't yet queued the Combatant that's using this move, so we check for
-     1 unqueued Combatant here */
+     only 1 unqueued Combatant here */
   if (unqueuedFriendlyCombatants.size <= 1) {
     newMatchContext = { kind: "moveSelectionConfirmation" };
   } else {

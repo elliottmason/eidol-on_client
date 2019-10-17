@@ -105,6 +105,10 @@ interface IBenchedCombatantSelection {
   kind: "benchedCombatantSelection";
 }
 
+interface ICombatantDeploymentConfirmation {
+  kind: "combatantDeploymentConfirmation";
+}
+
 export interface IDeployedCombatantMoveSelection {
   combatantId: Id;
   kind: "deployedCombatantMoveSelection";
@@ -135,6 +139,7 @@ interface ITurnResolution {
 export type MatchContext =
   | IBenchedCombatantPlacement
   | IBenchedCombatantSelection
+  | ICombatantDeploymentConfirmation
   | IDeployedCombatantMoveSelection
   | IDeployedCombatantMoveTargeting
   | IMatchNotLoaded

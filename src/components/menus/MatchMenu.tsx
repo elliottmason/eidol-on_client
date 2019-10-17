@@ -9,6 +9,7 @@ import {
 } from "../../interfaces";
 
 import { BenchedCombatantSelectionMenu } from "./BenchedCombatantSelectionMenu";
+import { DeploymentConfirmationMenu } from "./DeploymentConfirmationMenu";
 import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu";
 import { MoveSelectionMenu } from "./MoveSelectionMenu";
 
@@ -22,6 +23,8 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
       case ("benchedCombatantPlacement"):
       case ("benchedCombatantSelection"):
         return this.renderBenchedCombatantSelectionMenu();
+      case ("combatantDeploymentConfirmation"):
+        return this.renderDeploymentConfirmationMenu();
       case ("deployedCombatantMoveSelection"):
         return this.renderMoveSelectionMenu();
       case ("moveSelectionConfirmation"):
@@ -47,6 +50,11 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
       />
     );
   }
+
+  private readonly renderDeploymentConfirmationMenu: () => JSX.Element =
+    (): JSX.Element => (
+      <DeploymentConfirmationMenu />
+    )
 
   private renderMoveSelectionConfirmationMenu(): JSX.Element {
     return (
