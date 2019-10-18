@@ -149,6 +149,7 @@ export type MatchContext =
 
 export interface IMatch {
   boardPositions: Board;
+  combatantDeployments: List<ICombatantDeployment>;
   combatants: List<ICombatant>;
   context: MatchContext;
   events: IMatchEvent[];
@@ -156,6 +157,11 @@ export interface IMatch {
   moveSelections: List<IMoveSelection>;
   players: IPlayer[];
   turn: number;
+}
+
+export interface ICombatantDeployment {
+  boardPositionId: Id;
+  combatantId: Id;
 }
 
 export interface IMatchEvent {

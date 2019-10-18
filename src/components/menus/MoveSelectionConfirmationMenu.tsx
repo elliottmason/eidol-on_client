@@ -83,9 +83,12 @@ class MoveSelectionConfirmationMenuComponent
   public render(): JSX.Element {
     return (
       <div>
-        <div>Ampul will Move to position 25</div>
-        <div>Helljung will throw a Fireball at position 25</div>
-        <button onClick={this.confirm}>Confirm</button>
+        <p>Ampul will Move to position 25</p>
+        <p>Helljung will throw a Fireball at position 25</p>
+        <div>
+          <button onClick={this.confirm}>Confirm</button>
+          <button>Cancel</button>
+        </div>
       </div>
     );
   }

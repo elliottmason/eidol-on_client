@@ -19,6 +19,7 @@ import {
   IActionTargetBoardPosition,
   IAppState,
   ICombatant,
+  ICombatantDeployment,
   Id,
   IDeployedCombatantMoveTargeting,
   IMatch,
@@ -32,6 +33,7 @@ import {
 const initialState: IAppState = {
   match: {
     boardPositions: [],
+    combatantDeployments: List(),
     combatants: List(),
     context: { kind: "matchNotLoaded" },
     events: [],
@@ -101,16 +103,17 @@ const deployBenchedCombatant: (
       combatant.boardPositionId === undefined,
   );
 
-  const deployedFriendlyCombatants: List<
-    ICombatant
-  > = friendlyCombatants.filter(
-    (combatant: ICombatant) =>
-      combatant.boardPositionId !== null &&
-      combatant.boardPositionId !== undefined,
-  );
+  const oldCombatantDeployments: List<ICombatantDeployment> =
+    state.match.combatantDeployments;
+  const combatantDeployments: List<
+    ICombatantDeployment
+  > = oldCombatantDeployments.push({
+    boardPositionId,
+    combatantId: oldCombatant.id,
+  });
 
   const isDeploymentFinished: boolean =
-    deployedFriendlyCombatants.size === maxDeployedFriendlyCombatants ||
+    combatantDeployments.size === maxDeployedFriendlyCombatants ||
     benchedFriendlyCombatants.size === 0;
 
   const context: MatchContext = isDeploymentFinished
@@ -121,6 +124,7 @@ const deployBenchedCombatant: (
     ...state,
     match: {
       ...state.match,
+      combatantDeployments,
       combatants,
       context,
     },
@@ -176,6 +180,8 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   if (boardPositions === undefined) {
     boardPositions = state.match.boardPositions;
   }
+
+  const combatantDeployments: List<ICombatantDeployment> = List();
 
   const combatants: List<ICombatant> =
     match.combatants === undefined
@@ -236,6 +242,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     ...state,
     match: {
       boardPositions,
+      combatantDeployments,
       combatants,
       context,
       events,

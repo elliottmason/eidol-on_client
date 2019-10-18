@@ -51,15 +51,22 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
     );
   }
 
-  private readonly renderDeploymentConfirmationMenu: () => JSX.Element =
-    (): JSX.Element => (
-      <DeploymentConfirmationMenu />
-    )
+  private renderDeploymentConfirmationMenu(): JSX.Element {
+    const { combatantDeployments } = this.props.match;
+
+    return (
+      <DeploymentConfirmationMenu
+        combatantDeployments={combatantDeployments}
+      />
+    );
+  }
 
   private renderMoveSelectionConfirmationMenu(): JSX.Element {
+    const { moveSelections } = this.props.match;
+
     return (
       <MoveSelectionConfirmationMenu
-        moveSelections={this.props.match.moveSelections}
+        moveSelections={moveSelections}
       />
     );
   }
