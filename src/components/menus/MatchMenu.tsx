@@ -12,6 +12,7 @@ import { BenchedCombatantSelectionMenu } from "./BenchedCombatantSelectionMenu";
 import { DeploymentConfirmationMenu } from "./DeploymentConfirmationMenu";
 import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu";
 import { MoveSelectionMenu } from "./MoveSelectionMenu";
+import { MatchUpdatePendingMenu } from "./MatchUpdatePendingMenu";
 
 interface IMatchMenuProps {
   match: IMatch;
@@ -20,6 +21,8 @@ interface IMatchMenuProps {
 export class MatchMenu extends React.Component<IMatchMenuProps> {
   public render(): JSX.Element {
     switch (this.props.match.context.kind) {
+      case ("matchUpdatePending"):
+        return this.renderMatchUpdatePendingMenu();
       case ("benchedCombatantPlacement"):
       case ("benchedCombatantSelection"):
         return this.renderBenchedCombatantSelectionMenu();
@@ -60,6 +63,11 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
       />
     );
   }
+
+  private readonly renderMatchUpdatePendingMenu: () => JSX.Element =
+    (): JSX.Element => (
+      <MatchUpdatePendingMenu />
+    )
 
   private renderMoveSelectionConfirmationMenu(): JSX.Element {
     const { moveSelections } = this.props.match;

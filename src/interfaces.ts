@@ -7,10 +7,12 @@ type MatchEventProperty = "normal";
 type PlayerTeam = 1 | 2;
 
 export type Action =
+  | IActionCancelCombatantDeployments
   | IActionDeployBenchedCombatant
   | IActionPlayMatchEvent
   | IActionSelectCombatantForDeployment
   | IActionSelectMove
+  | IActionSubmitCombatantDeployments
   | IActionSubmitMoveSelections
   | IActionSyncMatch
   | IActionTargetBoardPosition;
@@ -19,17 +21,21 @@ export interface IAction {
   type: string;
 }
 
-export interface IActionDeployBenchedCombatant {
+export interface IActionCancelCombatantDeployments extends IAction {
+  type: "CANCEL_COMBATANT_DEPLOYMENTS";
+}
+
+export interface IActionDeployBenchedCombatant extends IAction {
   boardPositionId: Id;
   type: "DEPLOY_BENCHED_COMBATANT";
 }
 
-export interface IActionPlayMatchEvent {
+export interface IActionPlayMatchEvent extends IAction {
   event: IMatchEvent;
   type: "PLAY_MATCH_EVENT";
 }
 
-export interface IActionSelectCombatantForDeployment {
+export interface IActionSelectCombatantForDeployment extends IAction {
   combatantId: Id;
   type: "SELECT_COMBATANT_FOR_DEPLOYMENT";
 }
@@ -37,6 +43,10 @@ export interface IActionSelectCombatantForDeployment {
 export interface IActionSelectMove extends IAction {
   moveId: Id;
   type: "SELECT_MOVE";
+}
+
+export interface IActionSubmitCombatantDeployments extends IAction {
+  type: "SUBMIT_COMBATANT_DEPLOYMENTS";
 }
 
 export interface IActionSubmitMoveSelections extends IAction {

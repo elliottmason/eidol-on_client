@@ -57,6 +57,18 @@ const nullCombatant: ICombatant = {
   remainingHealth: 0,
 };
 
+const cancelCombatantDeployments: (state: IAppState) => IAppState = (
+  state: IAppState,
+): IAppState => ({
+  ...state,
+  match: {
+    ...state.match,
+    context: {
+      kind: "benchedCombatantSelection",
+    },
+  },
+});
+
 const deployBenchedCombatant: (
   state: IAppState,
   action: IActionDeployBenchedCombatant,
@@ -152,7 +164,7 @@ const selectMove: (state: IAppState, action: IActionSelectMove) => IAppState = (
   };
 };
 
-const submitMoveSelections: (state: IAppState) => IAppState = (
+const awaitMatchUpdate: (state: IAppState) => IAppState = (
   state: IAppState,
 ): IAppState => {
   const newMatchContext: IMatchUpdatePending = {
@@ -421,6 +433,8 @@ export const rootReducer: (
   action: Action,
 ): IAppState => {
   switch (action.type) {
+    case "CANCEL_COMBATANT_DEPLOYMENTS":
+      return cancelCombatantDeployments(state);
     case "DEPLOY_BENCHED_COMBATANT":
       return deployBenchedCombatant(state, action);
     case "PLAY_MATCH_EVENT":
@@ -429,8 +443,9 @@ export const rootReducer: (
       return selectCombatantForDeployment(state, action);
     case "SELECT_MOVE":
       return selectMove(state, action);
+    case "SUBMIT_COMBATANT_DEPLOYMENTS":
     case "SUBMIT_MOVE_SELECTIONS":
-      return submitMoveSelections(state);
+      return awaitMatchUpdate(state);
     case "SYNC_MATCH":
       return syncMatch(state, action);
     case "TARGET_BOARD_POSITION":

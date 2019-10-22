@@ -3,7 +3,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
-import { ICombatantDeployment, Id } from "../../interfaces";
+import {
+  IActionCancelCombatantDeployments,
+  IActionSubmitCombatantDeployments,
+  ICombatantDeployment,
+  Id,
+} from "../../interfaces";
 
 interface IDeploymentConfirmationMenuProps {
   combatantDeployments: List<ICombatantDeployment>;
@@ -18,6 +23,18 @@ interface ICombatantDeploymentJson {
   board_position_id: Id;
   match_combatant_id: Id;
 }
+
+const awaitMatchUpdate: () => IActionSubmitCombatantDeployments =
+  (): IActionSubmitCombatantDeployments => (
+    {
+      type: "SUBMIT_COMBATANT_DEPLOYMENTS",
+    }
+  );
+
+const cancelCombatantDepoyments: () => IActionCancelCombatantDeployments =
+  (): IActionCancelCombatantDeployments => ({
+    type: "CANCEL_COMBATANT_DEPLOYMENTS",
+  });
 
 const submitCombatantDeployments:
   (combatantDeployments: List<ICombatantDeployment>) =>
@@ -36,7 +53,9 @@ const submitCombatantDeployments:
 
     const bodyArray: ICombatantDeploymentJson[] = bodyCollection.toArray();
 
-    const bodyObject = bodyArray;
+    const bodyObject: {} = {
+      match_combatant_deployments: bodyArray,
+    };
 
     const body: string = JSON.stringify(bodyObject);
 
@@ -49,12 +68,21 @@ const submitCombatantDeployments:
     });
   };
 
-const confirmCombatantDeployments =
-  (combatantDeployments: List<ICombatantDeployment>) => (
-    (dispatch: Dispatch) => (
-      submitCombatantDeployments(combatantDeployments)
-    )
-  );
+const confirmCombatantDeployments:
+  (combatantDeployments: List<ICombatantDeployment>) =>
+    (dispatch: Dispatch) =>
+      Promise<void> =
+  (combatantDeployments: List<ICombatantDeployment>): (dispatch: Dispatch) =>
+    Promise<void> => (
+      (dispatch: Dispatch): Promise<void> => (
+        submitCombatantDeployments(combatantDeployments)
+          .then(
+            (response: Response): void => {
+              dispatch(awaitMatchUpdate());
+            },
+          )
+      )
+    );
 
 class DeploymentConfirmationMenuComponent
   extends React.Component<IDeploymentConfirmationMenuComponentProps> {
@@ -74,7 +102,9 @@ class DeploymentConfirmationMenuComponent
   }
 
   private _cancel(): void {
+    const { dispatch } = this.props;
 
+    dispatch(cancelCombatantDepoyments());
   }
 
   private _confirm(): void {
