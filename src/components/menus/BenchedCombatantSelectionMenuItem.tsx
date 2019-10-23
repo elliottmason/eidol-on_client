@@ -9,7 +9,6 @@ import {
 
 interface IBenchedCombatantSelectionMenuItemProps {
   combatant: ICombatant;
-  isSelected: boolean;
 }
 
 interface IBenchedCombatantSelectionMenuItemComponentProps
@@ -34,7 +33,7 @@ class BenchedCombatantSelectionMenuItemComponent
   public render(): JSX.Element {
     return (
       <button
-        disabled={this.props.isSelected}
+        disabled={this.isDisabled()}
         key={this.props.combatant.id}
         onClick={this.selectCombatantForDeployment}
         style={{ display: "block" }}
@@ -48,6 +47,13 @@ class BenchedCombatantSelectionMenuItemComponent
     const { combatant, dispatch } = this.props;
 
     dispatch(selectCombatantForDeployment(combatant.id));
+  }
+
+  private isDisabled(): boolean {
+    const { combatant } = this.props;
+
+    return combatant.isSelectedForDeployment ||
+      combatant.availability === 'knocked_out';
   }
 }
 

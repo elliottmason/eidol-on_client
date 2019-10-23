@@ -28,7 +28,6 @@ export class BenchedCombatantSelectionMenu
           <BenchedCombatantSelectionMenuItem
             key={combatant.id}
             combatant={combatant}
-            isSelected={combatant.isSelectedForDeployment}
           />
         ),
       )

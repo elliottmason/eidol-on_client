@@ -2,6 +2,8 @@ import { List } from "immutable";
 
 export type Id = string;
 
+type CombatantAvailability = "available" | "benched" | "knocked_out";
+
 type MatchEventProperty = "normal";
 
 type PlayerTeam = 1 | 2;
@@ -86,18 +88,17 @@ export interface IBoardProps {
   positions: Board;
 }
 
-interface IMatchCombatant {
-  boardPositionId?: Id | null;
+export interface ICombatant {
+  availability: CombatantAvailability;
+  boardPositionId?: Id;
+  defense?: number;
   id: Id;
-  name: string;
-}
-
-export interface ICombatant extends IMatchCombatant {
   isFriendly: true;
   isQueued: boolean;
   isSelectedForDeployment: boolean;
   maximumHealth: number;
   moves: IMove[];
+  name: string;
   remainingHealth: number;
 }
 

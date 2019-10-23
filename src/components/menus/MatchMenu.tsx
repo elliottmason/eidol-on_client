@@ -10,9 +10,9 @@ import {
 
 import { BenchedCombatantSelectionMenu } from "./BenchedCombatantSelectionMenu";
 import { DeploymentConfirmationMenu } from "./DeploymentConfirmationMenu";
+import { MatchUpdatePendingMenu } from "./MatchUpdatePendingMenu";
 import { MoveSelectionConfirmationMenu } from "./MoveSelectionConfirmationMenu";
 import { MoveSelectionMenu } from "./MoveSelectionMenu";
-import { MatchUpdatePendingMenu } from "./MatchUpdatePendingMenu";
 
 interface IMatchMenuProps {
   match: IMatch;
@@ -41,10 +41,7 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
     const benchedFriendlyCombatants: List<ICombatant> =
       this.props.match.combatants.filter(
         (combatant: ICombatant) =>
-          combatant.isFriendly && (
-            combatant.boardPositionId === null ||
-            combatant.boardPositionId === undefined
-          ),
+          combatant.isFriendly && combatant.boardPositionId === undefined,
       );
 
     return (

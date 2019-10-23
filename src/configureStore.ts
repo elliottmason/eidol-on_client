@@ -47,7 +47,8 @@ const initialState: IAppState = {
 const maxDeployedFriendlyCombatants: number = 2;
 
 const nullCombatant: ICombatant = {
-  id: "0",
+  availability: "knocked_out",
+  id: "1",
   isFriendly: true,
   isQueued: false,
   isSelectedForDeployment: false,
@@ -204,12 +205,14 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     (combatant: ICombatant) => combatant.isFriendly,
   );
 
+  const benchedCombatants: List<ICombatant> = friendlyCombatants.filter(
+    (combatant: ICombatant) => combatant.availability === "benched",
+  );
+
   const deployedFriendlyCombatants: List<
     ICombatant
   > = friendlyCombatants.filter(
-    (combatant: ICombatant) =>
-      combatant.boardPositionId !== null &&
-      combatant.boardPositionId !== undefined,
+    (combatant: ICombatant) => combatant.boardPositionId !== undefined,
   );
 
   const selectedCombatant: ICombatant = deployedFriendlyCombatants.get(
@@ -221,7 +224,10 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
 
   const deployedCombatantMax: number = 2;
 
-  if (deployedFriendlyCombatants.size === deployedCombatantMax) {
+  if (
+    benchedCombatants.size === 0 ||
+    deployedFriendlyCombatants.size === deployedCombatantMax
+  ) {
     context = {
       combatantId: selectedCombatant.id,
       kind: "deployedCombatantMoveSelection",
