@@ -50,7 +50,6 @@ const nullCombatant: ICombatant = {
   availability: "knocked_out",
   id: "1",
   isFriendly: true,
-  isQueued: false,
   isSelectedForDeployment: false,
   maximumHealth: 0,
   moves: [],
@@ -215,6 +214,12 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     (combatant: ICombatant) => combatant.boardPositionId !== undefined,
   );
 
+  const availableDeployedFriendlyCombatants: List<
+    ICombatant
+  > = friendlyCombatants.filter(
+    (combatant: ICombatant) => combatant.availability === "available",
+  );
+
   const selectedCombatant: ICombatant = deployedFriendlyCombatants.get(
     0,
     nullCombatant,
@@ -225,16 +230,20 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   const deployedCombatantMax: number = 2;
 
   if (
-    benchedCombatants.size === 0 ||
-    deployedFriendlyCombatants.size === deployedCombatantMax
+    deployedFriendlyCombatants.size < deployedCombatantMax &&
+    benchedCombatants.size >= 1
   ) {
+    context = {
+      kind: "benchedCombatantSelection",
+    };
+  } else if (availableDeployedFriendlyCombatants.size > 0) {
     context = {
       combatantId: selectedCombatant.id,
       kind: "deployedCombatantMoveSelection",
     };
   } else {
     context = {
-      kind: "benchedCombatantSelection",
+      kind: "matchUpdatePending",
     };
   }
 
@@ -364,7 +373,7 @@ const targetBoardPosition: (
   > = state.match.combatants.filter(
     (combatant: ICombatant) =>
       combatant.isFriendly &&
-      !combatant.isQueued &&
+      combatant.availability !== "queued" &&
       combatant.boardPositionId !== undefined,
   );
 
@@ -404,7 +413,7 @@ const targetBoardPosition: (
       ) {
         return {
           ...combatant,
-          isQueued: true,
+          availability: "queued",
         };
       }
 

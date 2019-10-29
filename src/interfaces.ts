@@ -2,7 +2,7 @@ import { List } from "immutable";
 
 export type Id = string;
 
-type CombatantAvailability = "available" | "benched" | "knocked_out";
+type CombatantAvailability = "available" | "benched" | "knocked_out" | "queued";
 
 type MatchEventProperty = "normal";
 
@@ -94,7 +94,6 @@ export interface ICombatant {
   defense?: number;
   id: Id;
   isFriendly: true;
-  isQueued: boolean;
   isSelectedForDeployment: boolean;
   maximumHealth: number;
   moves: IMove[];
@@ -184,6 +183,7 @@ export interface IMatchEvent {
   id: Id;
   matchCombatantId?: Id;
   property: MatchEventProperty;
+  status: "failed" | "successful";
   turn: number;
 }
 
