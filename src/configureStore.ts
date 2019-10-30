@@ -220,7 +220,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     (combatant: ICombatant) => combatant.availability === "available",
   );
 
-  const selectedCombatant: ICombatant = deployedFriendlyCombatants.get(
+  const selectedCombatant: ICombatant = availableDeployedFriendlyCombatants.get(
     0,
     nullCombatant,
   );

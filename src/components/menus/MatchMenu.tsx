@@ -80,10 +80,10 @@ export class MatchMenu extends React.Component<IMatchMenuProps> {
     const matchContext: MatchContext = this.props.match.context;
     const combatantId: string =
       (matchContext as IDeployedCombatantMoveSelection).combatantId;
+    const { combatants } = this.props.match;
     const combatant: ICombatant | undefined =
-      this.props.match.combatants.find(
-        (potentialCombatant: ICombatant) =>
-          (potentialCombatant.id === combatantId),
+      combatants.find((potentialCombatant: ICombatant) =>
+        (potentialCombatant.id === combatantId),
       );
 
     if (combatant !== undefined) {
