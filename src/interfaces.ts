@@ -10,6 +10,7 @@ type PlayerTeam = 1 | 2;
 
 export type Action =
   | IActionCancelCombatantDeployments
+  | IActionCancelMoveSelections
   | IActionDeployBenchedCombatant
   | IActionPlayMatchEvent
   | IActionSelectCombatantForDeployment
@@ -25,6 +26,10 @@ export interface IAction {
 
 export interface IActionCancelCombatantDeployments extends IAction {
   type: "CANCEL_COMBATANT_DEPLOYMENTS";
+}
+
+export interface IActionCancelMoveSelections {
+  type: "CANCEL_MOVE_SELECTIONS";
 }
 
 export interface IActionDeployBenchedCombatant extends IAction {

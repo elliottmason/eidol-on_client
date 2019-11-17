@@ -4,17 +4,31 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
+  IActionCancelMoveSelections,
   IActionSubmitMoveSelections,
+  IAppState,
+  IBoardPosition,
+  ICombatant,
   Id,
+  IMove,
   IMoveSelection,
 } from "../../interfaces";
+import { nullBoardPosition, nullCombatant, nullMove } from "../../nullObjects";
+
+import { MoveSelectionConfirmationMenuItem } from "./MoveSelectionConfirmationMenuItem";
 
 interface IMoveSelectionConfirmationMenuProps {
   moveSelections: List<IMoveSelection>;
 }
 
-interface IMoveSelectionConfirmationMenuComponentProps
-  extends IMoveSelectionConfirmationMenuProps {
+interface IRealMoveSelection {
+  boardPosition: IBoardPosition;
+  combatant: ICombatant;
+  move: IMove;
+}
+
+interface IMoveSelectionConfirmationMenuComponentProps {
+  moveSelections: List<IRealMoveSelection>;
   dispatch(func: {}): void;
 }
 
@@ -30,15 +44,22 @@ const awaitMatchUpdate: () => IActionSubmitMoveSelections =
     }
   );
 
+const cancelMoveSelections: () => IActionCancelMoveSelections =
+  (): IActionCancelMoveSelections => (
+    {
+      type: "CANCEL_MOVE_SELECTIONS",
+    }
+  );
+
 const submitMoveSelections:
-  (moveSelections: List<IMoveSelection>) => Promise<Response> =
-  async (moveSelections: List<IMoveSelection>): Promise<Response> => {
+  (moveSelections: List<IRealMoveSelection>) => Promise<Response> =
+  async (moveSelections: List<IRealMoveSelection>): Promise<Response> => {
     const bodyArray: IMoveSelectionJson[] =
       moveSelections.map(
-        (moveSelection: IMoveSelection) => (
+        (moveSelection: IRealMoveSelection) => (
           {
-            board_position_id: moveSelection.boardPositionId,
-            match_combatants_move_id: moveSelection.moveId,
+            board_position_id: moveSelection.boardPosition.id,
+            match_combatants_move_id: moveSelection.move.id,
           }
         ),
       )
@@ -60,10 +81,10 @@ const submitMoveSelections:
   };
 
 const confirmMoveSelections:
-  (moveSelections: List<IMoveSelection>) =>
+  (moveSelections: List<IRealMoveSelection>) =>
     (dispatch: Dispatch) =>
       Promise<void> =
-  (moveSelections: List<IMoveSelection>):
+  (moveSelections: List<IRealMoveSelection>):
     (dispatch: Dispatch) => Promise<void> => (
       (dispatch: Dispatch): Promise<void> => (
         submitMoveSelections(moveSelections)
@@ -77,29 +98,92 @@ const confirmMoveSelections:
 
 class MoveSelectionConfirmationMenuComponent
   extends React.Component<IMoveSelectionConfirmationMenuComponentProps> {
-  private readonly confirm: (e: React.MouseEvent) => void =
+  private readonly cancel: () => void = this._cancel.bind(this);
+
+  private readonly confirm: () => void =
     this._confirm.bind(this);
 
   public render(): JSX.Element {
     return (
       <div>
-        <p>Ampul will Move to position 25</p>
-        <p>Helljung will throw a Fireball at position 25</p>
+        {this.renderMoveSelections()}
         <div>
           <button onClick={this.confirm}>Confirm</button>
-          <button>Cancel</button>
+          <button onClick={this.cancel}>Cancel</button>
         </div>
       </div>
     );
   }
 
-  private _confirm(e: React.MouseEvent): void {
+  private _cancel(): void {
+    const { dispatch } = this.props;
+
+    dispatch(cancelMoveSelections());
+  }
+
+  private _confirm(): void {
     const { dispatch } = this.props;
 
     dispatch(confirmMoveSelections(this.props.moveSelections));
   }
+
+  private renderMoveSelections(): List<JSX.Element> {
+    const { moveSelections } = this.props;
+
+    return moveSelections.map(
+      (moveSelection: IRealMoveSelection) => (
+        <MoveSelectionConfirmationMenuItem
+          boardPosition={moveSelection.boardPosition}
+          combatant={moveSelection.combatant}
+          key={moveSelection.move.id}
+          move={moveSelection.move}
+        />
+      )
+    );
+  }
 }
+
+const mapStateToProps = (
+  state: IAppState,
+  ownProps: IMoveSelectionConfirmationMenuProps,
+) => {
+  const moveSelections: List<IRealMoveSelection> =
+    ownProps.moveSelections.map(
+      (moveSelection: IMoveSelection) => {
+        let boardPosition: IBoardPosition | undefined =
+          state.match.boardPositions.find(
+            (potentialBoardPosition: IBoardPosition) =>
+              potentialBoardPosition.id === moveSelection.boardPositionId,
+          );
+        if (boardPosition === undefined) { boardPosition = nullBoardPosition; }
+
+
+        let combatant: ICombatant | undefined =
+          state.match.combatants.find(
+            (potentialCombatant: ICombatant) =>
+              potentialCombatant.id === moveSelection.combatantId,
+          );
+        if (combatant === undefined) { combatant = nullCombatant; }
+
+        let move: IMove | undefined =
+          combatant.moves.find(
+            (potentialMove: IMove) => potentialMove.id === moveSelection.moveId,
+          );
+        if (move === undefined) { move = nullMove; }
+
+        return (
+          {
+            boardPosition,
+            combatant,
+            move,
+          }
+        );
+      },
+    );
+
+  return ({ moveSelections });
+};
 
 export const MoveSelectionConfirmationMenu:
   React.ComponentClass<IMoveSelectionConfirmationMenuProps> =
-  connect()(MoveSelectionConfirmationMenuComponent);
+  connect(mapStateToProps)(MoveSelectionConfirmationMenuComponent);

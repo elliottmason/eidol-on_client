@@ -28,7 +28,9 @@ import {
   IMatchUpdatePending,
   IMoveSelection,
   MatchContext,
+  IMove,
 } from "./interfaces";
+import { nullCombatant } from "./nullObjects";
 
 const initialState: IAppState = {
   match: {
@@ -46,17 +48,6 @@ const initialState: IAppState = {
 
 const maxDeployedFriendlyCombatants: number = 2;
 
-const nullCombatant: ICombatant = {
-  availability: "knocked_out",
-  id: "1",
-  isFriendly: true,
-  isSelectedForDeployment: false,
-  maximumHealth: 0,
-  moves: [],
-  name: "Eidol",
-  remainingHealth: 0,
-};
-
 const cancelCombatantDeployments: (state: IAppState) => IAppState = (
   state: IAppState,
 ): IAppState => ({
@@ -68,6 +59,56 @@ const cancelCombatantDeployments: (state: IAppState) => IAppState = (
     },
   },
 });
+
+const cancelMoveSelectons: (state: IAppState) => IAppState = (
+  state: IAppState,
+): IAppState => {
+  const { moveSelections } = state.match;
+
+  const oldCombatants: List<ICombatant> = state.match.combatants;
+
+  const combatants: List<ICombatant> = oldCombatants.map(
+    (combatant: ICombatant) => {
+      const moveSelectionForCombatant:
+        | IMoveSelection
+        | undefined = moveSelections.find(
+        (moveSelection: IMoveSelection) =>
+          moveSelection.combatantId === combatant.id,
+      );
+      if (moveSelectionForCombatant !== undefined) {
+        return {
+          ...combatant,
+          availability: "available",
+        };
+      }
+
+      return combatant;
+    },
+  );
+
+  const availableFriendlyCombatants: List<ICombatant> = combatants.filter(
+    (combatant: ICombatant) =>
+      combatant.availability === "available" && combatant.isFriendly,
+  );
+  const selectedCombatant: ICombatant = availableFriendlyCombatants.get(
+    0,
+    nullCombatant,
+  );
+  const combatantId: Id = selectedCombatant.id;
+
+  return {
+    ...state,
+    match: {
+      ...state.match,
+      combatants,
+      context: {
+        combatantId,
+        kind: "deployedCombatantMoveSelection",
+      },
+      moveSelections: List(),
+    },
+  };
+};
 
 const deployBenchedCombatant: (
   state: IAppState,
@@ -450,6 +491,8 @@ export const rootReducer: (
   switch (action.type) {
     case "CANCEL_COMBATANT_DEPLOYMENTS":
       return cancelCombatantDeployments(state);
+    case "CANCEL_MOVE_SELECTIONS":
+      return cancelMoveSelectons(state);
     case "DEPLOY_BENCHED_COMBATANT":
       return deployBenchedCombatant(state, action);
     case "PLAY_MATCH_EVENT":
