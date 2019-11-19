@@ -1,3 +1,4 @@
+import { List } from "immutable";
 import React, { CSSProperties } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -70,13 +71,13 @@ const connectToMatch: (matchId: Id) => (dispatch: Dispatch) => {
 
         const currentMatchTurn: number = matchTurn - 1;
 
-        let matchEventsForTurn: IMatchEvent[];
+        let matchEventsForTurn: List<IMatchEvent>;
 
         const baseTimeout: number = 3000;
 
         if (payload.kind === "update") {
-          let matchEvents: IMatchEvent[] | undefined = match.events;
-          if (matchEvents === undefined) { matchEvents = []; }
+          let matchEvents: List<IMatchEvent> = List(match.events);
+          if (matchEvents === undefined) { matchEvents = List(); }
 
           matchEventsForTurn = matchEvents.filter(
             (matchEvent: IMatchEvent) => (
@@ -91,10 +92,10 @@ const connectToMatch: (matchId: Id) => (dispatch: Dispatch) => {
             },
           );
         } else {
-          matchEventsForTurn = [];
+          matchEventsForTurn = List();
         }
 
-        const syncDelay: number = baseTimeout * matchEventsForTurn.length;
+        const syncDelay: number = baseTimeout * matchEventsForTurn.size;
         setTimeout(() => dispatch(syncMatch(match)), syncDelay);
       },
       room: matchId,
@@ -113,11 +114,13 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
   public render(): JSX.Element {
     const { match } = this.props;
     const { boardPositions } = match;
+    const matchContext: MatchContext = match.context;
 
     return (
       <div className="Match" style={this.style()}>
         <Board
           isReversed={this.isBoardReversed()}
+          matchContext={matchContext}
           positions={boardPositions}
         />
         <MatchMenu match={match} />
@@ -127,11 +130,23 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
 
   private isBoardReversed(): boolean {
     const { players } = this.props.match;
-    const secondPlayer: IPlayer | undefined =
+
+    /* Sort the players by their ID as an arbitrary but predictable way of
+       determining which side of the board "belongs" to which player */
+    const sortedPlayers: List<IPlayer> =
       players.sort(
-        (playerA: IPlayer, playerB: IPlayer) =>
-          parseInt(playerB.id, 10) - parseInt(playerA.id, 10),
-      )[0];
+        (playerA: IPlayer, playerB: IPlayer) => {
+          const playerAId: number = parseInt(playerA.id, 10);
+          const playerBId: number = parseInt(playerB.id, 10);
+
+          if (playerAId < playerBId) { return -1; }
+          if (playerAId > playerBId) { return 1; }
+
+          return 0;
+        },
+      );
+    const secondPlayer: IPlayer | undefined = players.first();
+
     const localPlayer: IPlayer | undefined =
       players.find((player: IPlayer) => player.isLocalPlayer);
 

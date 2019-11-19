@@ -1,3 +1,4 @@
+import { List } from "immutable";
 import React, { CSSProperties } from "react";
 
 import { IBoardPosition, IBoardProps } from "../interfaces";
@@ -23,7 +24,7 @@ export class Board extends React.Component<IBoardProps> {
   }
 
   private boardDimensionSize(dimension: "x" | "y"): number {
-    const coords: number[] =
+    const coords: List<number> =
       this.props.positions.map(
         (position: IBoardPosition) => (position[dimension]),
       );
@@ -41,7 +42,7 @@ export class Board extends React.Component<IBoardProps> {
     return this.boardDimensionSize("x");
   }
 
-  private renderBoardPositions(): JSX.Element[] {
+  private renderBoardPositions(): List<JSX.Element> {
     return this.props.positions.map(
       (position: IBoardPosition) => {
         let x: number;
@@ -54,10 +55,13 @@ export class Board extends React.Component<IBoardProps> {
           y = position.y;
         }
 
+        const { matchContext } = this.props;
+
         return (
           <BoardPosition
             id={position.id}
             key={position.id}
+            matchContext={matchContext}
             x={x}
             y={y}
           />

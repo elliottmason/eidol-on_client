@@ -80,7 +80,7 @@ export interface IMoveSelection {
   moveId: Id;
 }
 
-type Board = IBoardPosition[];
+type Board = List<IBoardPosition>;
 
 export interface IBoardPosition {
   id: Id;
@@ -90,6 +90,7 @@ export interface IBoardPosition {
 
 export interface IBoardProps {
   isReversed: boolean;
+  matchContext: MatchContext;
   positions: Board;
 }
 
@@ -101,7 +102,7 @@ export interface ICombatant {
   isFriendly: true;
   isSelectedForDeployment: boolean;
   maximumHealth: number;
-  moves: IMove[];
+  moves: List<IMove>;
   name: string;
   remainingHealth: number;
 }
@@ -167,10 +168,10 @@ export interface IMatch {
   combatantDeployments: List<ICombatantDeployment>;
   combatants: List<ICombatant>;
   context: MatchContext;
-  events: IMatchEvent[];
+  events: List<IMatchEvent>;
   id: Id;
   moveSelections: List<IMoveSelection>;
-  players: IPlayer[];
+  players: List<IPlayer>;
   turn: number;
 }
 
@@ -204,12 +205,12 @@ export interface IMatchesChannelJSON {
 }
 
 export interface IMatchJSON {
-  boardPositions?: Board;
-  combatants?: ICombatant[];
-  events?: IMatchEvent[];
-  id?: Id;
-  players?: IPlayer[];
-  turn?: number;
+  boardPositions: Board;
+  combatants: ICombatant[];
+  events: IMatchEvent[];
+  id: Id;
+  players: IPlayer[];
+  turn: number;
 }
 
 export interface IPlayer {

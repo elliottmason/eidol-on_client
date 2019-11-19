@@ -1,27 +1,22 @@
-import { List } from "immutable";
 import React, { CSSProperties } from "react";
 import { connect } from "react-redux";
 
 import {
   IActionDeployBenchedCombatant,
   IActionTargetBoardPosition,
-  IAppState,
-  ICombatant,
   Id,
   MatchContext,
 } from "../interfaces";
 
-import { Combatant } from "./Combatant";
-
 interface IBoardPositionProps {
   id: string;
+  matchContext: MatchContext;
   x: number;
   y: number;
 }
 
 interface IBoardPositionComponentProps extends IBoardPositionProps {
   matchContext: MatchContext;
-  occupants: List<ICombatant>;
   dispatch(func: {}): void;
 }
 
@@ -53,9 +48,7 @@ class BoardPositionComponent
         className="BoardPosition"
         onClick={this.handleClick}
         style={this.style()}
-      >
-        {this.renderOccupants()}
-      </div>
+      />
     );
   }
 
@@ -72,19 +65,6 @@ class BoardPositionComponent
       default:
         return;
     }
-  }
-
-  private renderOccupants(): List<JSX.Element> {
-    const occupants: List<JSX.Element> = this.props.occupants.map(
-      (combatant: ICombatant) => (
-        <Combatant
-          key={combatant.id}
-          combatant={combatant}
-        />
-      ),
-    );
-
-    return occupants;
   }
 
   private style(): CSSProperties {
@@ -110,28 +90,7 @@ class BoardPositionComponent
 
 interface IMappedProps {
   matchContext: MatchContext;
-  occupants: List<ICombatant>;
 }
 
-const mapStateToProps: (
-  state: IAppState,
-  ownProps: { id: Id },
-) => IMappedProps = (
-  state: IAppState,
-  ownProps: { id: Id },
-  ): IMappedProps => {
-    const boardPositionId: Id = ownProps.id;
-    const occupants: List<ICombatant> =
-      state.match.combatants.filter(
-        (combatant: ICombatant) =>
-          (combatant.boardPositionId === boardPositionId),
-      );
-
-    return {
-      matchContext: state.match.context,
-      occupants,
-    };
-  };
-
 export const BoardPosition: React.ComponentClass<IBoardPositionProps> =
-  connect(mapStateToProps)(BoardPositionComponent);
+  connect()(BoardPositionComponent);

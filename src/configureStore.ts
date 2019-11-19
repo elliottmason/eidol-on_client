@@ -29,19 +29,20 @@ import {
   IMoveSelection,
   MatchContext,
   IMove,
+  IBoardPosition,
 } from "./interfaces";
 import { nullCombatant } from "./nullObjects";
 
 const initialState: IAppState = {
   match: {
-    boardPositions: [],
+    boardPositions: List(),
     combatantDeployments: List(),
     combatants: List(),
     context: { kind: "matchNotLoaded" },
-    events: [],
+    events: List(),
     id: "0",
     moveSelections: List(),
-    players: [],
+    players: List(),
     turn: 0,
   },
 };
@@ -226,20 +227,16 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   state: IAppState,
   action: IActionSyncMatch,
 ): IAppState => {
-  const match: IMatchJSON = action.match;
+  const matchJSON: IMatchJSON = action.match;
 
-  let { boardPositions, events, id, players, turn }: IMatchJSON = match;
+  const boardPositions = List(matchJSON.boardPositions);
+  const combatants = List(matchJSON.combatants);
+  const events = List(matchJSON.events);
+  const players = List(matchJSON.players);
 
-  if (boardPositions === undefined) {
-    boardPositions = state.match.boardPositions;
-  }
+  let { id, turn } = matchJSON;
 
   const combatantDeployments: List<ICombatantDeployment> = List();
-
-  const combatants: List<ICombatant> =
-    match.combatants === undefined
-      ? state.match.combatants
-      : List(match.combatants);
 
   const friendlyCombatants: List<ICombatant> = combatants.filter(
     (combatant: ICombatant) => combatant.isFriendly,
@@ -288,23 +285,7 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
     };
   }
 
-  if (events === undefined) {
-    events = state.match.events;
-  }
-
-  if (id === undefined) {
-    id = "0";
-  }
-
   const moveSelections: List<IMoveSelection> = state.match.moveSelections;
-
-  if (players === undefined) {
-    players = state.match.players;
-  }
-
-  if (turn === undefined) {
-    turn = state.match.turn;
-  }
 
   return {
     ...state,

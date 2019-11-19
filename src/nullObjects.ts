@@ -1,3 +1,5 @@
+import { List } from "immutable";
+
 import { IBoardPosition, ICombatant, IMove } from "./interfaces";
 
 export const nullBoardPosition: IBoardPosition = {
@@ -12,7 +14,7 @@ export const nullCombatant: ICombatant = {
   isFriendly: true,
   isSelectedForDeployment: false,
   maximumHealth: 0,
-  moves: [],
+  moves: List(),
   name: "",
   remainingHealth: 0,
 };

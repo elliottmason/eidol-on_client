@@ -1,3 +1,4 @@
+import { List } from "immutable";
 import React from "react";
 
 import { ICombatant, IMove } from "../../interfaces";
@@ -20,9 +21,9 @@ export class MoveSelectionMenu
   }
 
   private moveButtons(): JSX.Element {
-    const moves: IMove[] = this.props.combatant.moves;
+    const moves: List<IMove> = this.props.combatant.moves;
 
-    const buttons: JSX.Element[] = moves.map(
+    const buttons: List<JSX.Element> = moves.map(
       (move: IMove) => (
         <MoveSelectionMenuItem key={move.id} move={move} />
       ),

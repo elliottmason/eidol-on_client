@@ -70,19 +70,15 @@ const submitCombatantDeployments:
 
 const confirmCombatantDeployments:
   (combatantDeployments: List<ICombatantDeployment>) =>
-    (dispatch: Dispatch) =>
-      Promise<void> =
-  (combatantDeployments: List<ICombatantDeployment>): (dispatch: Dispatch) =>
-    Promise<void> => (
-      (dispatch: Dispatch): Promise<void> => (
-        submitCombatantDeployments(combatantDeployments)
-          .then(
-            (response: Response): void => {
-              dispatch(awaitMatchUpdate());
-            },
-          )
-      )
-    );
+    (dispatch: Dispatch) => void =
+  (combatantDeployments: List<ICombatantDeployment>):
+    (dispatch: Dispatch) => void =>
+    (dispatch: Dispatch): void => {
+      submitCombatantDeployments(combatantDeployments)
+        .catch(() => undefined)
+        .then(() => undefined);
+      dispatch(awaitMatchUpdate());
+    };
 
 class DeploymentConfirmationMenuComponent
   extends React.Component<IDeploymentConfirmationMenuComponentProps> {

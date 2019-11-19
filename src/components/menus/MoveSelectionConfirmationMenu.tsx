@@ -143,46 +143,51 @@ class MoveSelectionConfirmationMenuComponent
   }
 }
 
-const mapStateToProps = (
-  state: IAppState,
-  ownProps: IMoveSelectionConfirmationMenuProps,
-) => {
-  const moveSelections: List<IRealMoveSelection> =
-    ownProps.moveSelections.map(
-      (moveSelection: IMoveSelection) => {
-        let boardPosition: IBoardPosition | undefined =
-          state.match.boardPositions.find(
-            (potentialBoardPosition: IBoardPosition) =>
-              potentialBoardPosition.id === moveSelection.boardPositionId,
+const mapStateToProps:
+  (
+    state: IAppState,
+    ownProps: IMoveSelectionConfirmationMenuProps,
+  ) => { moveSelections: List<IRealMoveSelection> } =
+  (
+    state: IAppState,
+    ownProps: IMoveSelectionConfirmationMenuProps,
+  ): { moveSelections: List<IRealMoveSelection> } => {
+    const moveSelections: List<IRealMoveSelection> =
+      ownProps.moveSelections.map(
+        (moveSelection: IMoveSelection) => {
+          let boardPosition: IBoardPosition | undefined =
+            state.match.boardPositions.find(
+              (potentialBoardPosition: IBoardPosition) =>
+                potentialBoardPosition.id === moveSelection.boardPositionId,
+            );
+          if (boardPosition === undefined) { boardPosition = nullBoardPosition; }
+
+          let combatant: ICombatant | undefined =
+            state.match.combatants.find(
+              (potentialCombatant: ICombatant) =>
+                potentialCombatant.id === moveSelection.combatantId,
+            );
+          if (combatant === undefined) { combatant = nullCombatant; }
+
+          let move: IMove | undefined =
+            combatant.moves.find(
+              (potentialMove: IMove) =>
+                potentialMove.id === moveSelection.moveId,
+            );
+          if (move === undefined) { move = nullMove; }
+
+          return (
+            {
+              boardPosition,
+              combatant,
+              move,
+            }
           );
-        if (boardPosition === undefined) { boardPosition = nullBoardPosition; }
+        },
+      );
 
-
-        let combatant: ICombatant | undefined =
-          state.match.combatants.find(
-            (potentialCombatant: ICombatant) =>
-              potentialCombatant.id === moveSelection.combatantId,
-          );
-        if (combatant === undefined) { combatant = nullCombatant; }
-
-        let move: IMove | undefined =
-          combatant.moves.find(
-            (potentialMove: IMove) => potentialMove.id === moveSelection.moveId,
-          );
-        if (move === undefined) { move = nullMove; }
-
-        return (
-          {
-            boardPosition,
-            combatant,
-            move,
-          }
-        );
-      },
-    );
-
-  return ({ moveSelections });
-};
+    return ({ moveSelections });
+  };
 
 export const MoveSelectionConfirmationMenu:
   React.ComponentClass<IMoveSelectionConfirmationMenuProps> =
