@@ -89,6 +89,7 @@ export interface IBoardPosition {
 }
 
 export interface IBoardProps {
+  combatants: List<ICombatant>;
   isReversed: boolean;
   matchContext: MatchContext;
   positions: Board;

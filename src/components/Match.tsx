@@ -113,12 +113,13 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
 
   public render(): JSX.Element {
     const { match } = this.props;
-    const { boardPositions } = match;
+    const { boardPositions, combatants } = match;
     const matchContext: MatchContext = match.context;
 
     return (
       <div className="Match" style={this.style()}>
         <Board
+          combatants={combatants}
           isReversed={this.isBoardReversed()}
           matchContext={matchContext}
           positions={boardPositions}

@@ -1,9 +1,11 @@
 import { List } from "immutable";
 import React, { CSSProperties } from "react";
 
-import { IBoardPosition, IBoardProps } from "../interfaces";
+import { IBoardPosition, IBoardProps, ICombatant } from "../interfaces";
+import { nullBoardPosition } from "../nullObjects";
 
 import { BoardPosition } from "./BoardPosition";
+import { Combatant } from "./Combatant";
 
 interface IDefaultProps {
   isReversed: boolean;
@@ -19,6 +21,7 @@ export class Board extends React.Component<IBoardProps> {
     return (
       <div className="Board" style={this.style()}>
         {this.renderBoardPositions()}
+        {this.renderCombatants()}
       </div>
     );
   }
@@ -64,6 +67,45 @@ export class Board extends React.Component<IBoardProps> {
             matchContext={matchContext}
             x={x}
             y={y}
+          />
+        );
+      },
+    );
+  }
+
+  private renderCombatants(): List<JSX.Element> {
+    const { combatants } = this.props;
+    const deployedCombatants: List<ICombatant> =
+      combatants.filter(
+        (combatant: ICombatant) => combatant.boardPositionId !== undefined,
+      );
+
+    return deployedCombatants.map(
+      (combatant: ICombatant) => {
+        let actualBoardPosition: IBoardPosition | undefined =
+          this.props.positions.find(
+            (position: IBoardPosition): boolean =>
+              (position.id === combatant.boardPositionId));
+        if (actualBoardPosition === undefined) {
+          actualBoardPosition = nullBoardPosition;
+        }
+
+        let boardPosition: IBoardPosition;
+        if (this.props.isReversed) {
+          boardPosition = {
+            ...actualBoardPosition,
+            x: this.boardWidth() - actualBoardPosition.x,
+            y: this.boardHeight() - actualBoardPosition.y,
+          };
+        } else {
+          boardPosition = actualBoardPosition;
+        }
+
+        return (
+          <Combatant
+            boardPosition={boardPosition}
+            combatant={combatant}
+            key={combatant.id}
           />
         );
       },
