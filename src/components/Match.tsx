@@ -66,18 +66,14 @@ const connectToMatch: (matchId: Id) => (dispatch: Dispatch) => {
       channel: "MatchesChannel",
       received: (payload: IMatchesChannelJSON): void => {
         const { match } = payload;
-        let matchTurn: number | undefined = match.turn;
-        if (matchTurn === undefined) { matchTurn = 1; }
-
+        const matchTurn: number = match.turn;
         const currentMatchTurn: number = matchTurn - 1;
+        const baseTimeout: number = 3000;
 
         let matchEventsForTurn: List<IMatchEvent>;
 
-        const baseTimeout: number = 3000;
-
         if (payload.kind === "update") {
-          let matchEvents: List<IMatchEvent> = List(match.events);
-          if (matchEvents === undefined) { matchEvents = List(); }
+          const matchEvents: List<IMatchEvent> = List(match.events);
 
           matchEventsForTurn = matchEvents.filter(
             (matchEvent: IMatchEvent) => (
@@ -146,7 +142,7 @@ class MatchComponent extends React.Component<IMatchComponentProps> {
           return 0;
         },
       );
-    const secondPlayer: IPlayer | undefined = players.first();
+    const secondPlayer: IPlayer | undefined = sortedPlayers.first();
 
     const localPlayer: IPlayer | undefined =
       players.find((player: IPlayer) => player.isLocalPlayer);

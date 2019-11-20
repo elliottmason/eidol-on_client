@@ -11,7 +11,7 @@ interface IMoveSelectionConfirmationMenuItemProps {
 export class MoveSelectionConfirmationMenuItem
   extends React.Component<IMoveSelectionConfirmationMenuItemProps> {
   public render(): JSX.Element {
-    const { boardPosition, combatant, move } = this.props;
+    const { combatant, move } = this.props;
 
     return (
       <div>

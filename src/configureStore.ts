@@ -28,8 +28,7 @@ import {
   IMatchUpdatePending,
   IMoveSelection,
   MatchContext,
-  IMove,
-  IBoardPosition,
+  IMatchEventRelocation,
 } from "./interfaces";
 import { nullCombatant } from "./nullObjects";
 
@@ -152,9 +151,7 @@ const deployBenchedCombatant: (
   );
 
   const benchedFriendlyCombatants: List<ICombatant> = friendlyCombatants.filter(
-    (combatant: ICombatant) =>
-      combatant.boardPositionId === null ||
-      combatant.boardPositionId === undefined,
+    (combatant: ICombatant) => combatant.boardPositionId === undefined,
   );
 
   const oldCombatantDeployments: List<ICombatantDeployment> =
@@ -303,6 +300,84 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
   };
 };
 
+const playMatchEventDamage: (
+  state: IAppState,
+  event: IMatchEventDamage,
+) => IAppState = (state: IAppState, event: IMatchEventDamage): IAppState => {
+  const combatantId: string = event.matchCombatantId;
+  const oldCombatants: List<ICombatant> = state.match.combatants;
+  const oldCombatantIndex: number = oldCombatants.findIndex(
+    (combatant: ICombatant) => combatant.id === combatantId,
+  );
+  const oldCombatant: ICombatant | undefined = oldCombatants.get(
+    oldCombatantIndex,
+  );
+
+  if (oldCombatant !== undefined) {
+    const remainingHealth: number = oldCombatant.remainingHealth - event.amount;
+    const newCombatant: ICombatant = {
+      ...oldCombatant,
+      remainingHealth,
+    };
+    const combatants: List<ICombatant> = oldCombatants.set(
+      oldCombatantIndex,
+      newCombatant,
+    );
+
+    return {
+      ...state,
+      match: {
+        ...state.match,
+        combatants,
+      },
+    };
+  }
+
+  return state;
+};
+
+const playMatchEventRelocation: (
+  state: IAppState,
+  event: IMatchEventRelocation,
+) => IAppState = (
+  state: IAppState,
+  event: IMatchEventRelocation,
+): IAppState => {
+  const oldCombatants: List<ICombatant> = state.match.combatants;
+  const oldCombatantIndex: number = oldCombatants.findIndex(
+    (combatant: ICombatant) => combatant.id === event.matchCombatantId,
+  );
+  const oldCombatant: ICombatant | undefined = oldCombatants.get(
+    oldCombatantIndex,
+  );
+
+  console.log(oldCombatant);
+
+  if (oldCombatant !== undefined) {
+    const newCombatant: ICombatant = {
+      ...oldCombatant,
+      boardPositionId: event.boardPositionId,
+    };
+
+    const combatants: List<ICombatant> = oldCombatants.set(
+      oldCombatantIndex,
+      newCombatant,
+    );
+
+    console.log(newCombatant);
+
+    return {
+      ...state,
+      match: {
+        ...state.match,
+        combatants,
+      },
+    };
+  }
+
+  return state;
+};
+
 const playMatchEvent: (
   state: IAppState,
   action: IActionPlayMatchEvent,
@@ -312,39 +387,12 @@ const playMatchEvent: (
 ): IAppState => {
   switch (action.event.category) {
     case "damage":
-      const event: IMatchEventDamage = action.event as IMatchEventDamage;
-      const combatantId: string = event.matchCombatantId;
-      const oldCombatants: List<ICombatant> = state.match.combatants;
-      const oldCombatantIndex: number = oldCombatants.findIndex(
-        (combatant: ICombatant) => combatant.id === combatantId,
+      return playMatchEventDamage(state, action.event as IMatchEventDamage);
+    case "relocation":
+      return playMatchEventRelocation(
+        state,
+        action.event as IMatchEventRelocation,
       );
-      const oldCombatant: ICombatant | undefined = oldCombatants.get(
-        oldCombatantIndex,
-      );
-
-      if (oldCombatant !== undefined) {
-        const remainingHealth: number =
-          oldCombatant.remainingHealth - event.amount;
-        const newCombatant: ICombatant = {
-          ...oldCombatant,
-          remainingHealth,
-        };
-        const combatants: List<ICombatant> = oldCombatants.splice(
-          oldCombatantIndex,
-          1,
-          newCombatant,
-        );
-
-        return {
-          ...state,
-          match: {
-            ...state.match,
-            combatants,
-          },
-        };
-      }
-
-      return state;
     default:
       return state;
   }
@@ -400,7 +448,7 @@ const targetBoardPosition: (
   );
 
   /* We haven't yet queued the Combatant that's using this move, so we check for
-     only 1 unqueued Combatant here */
+       only 1 unqueued Combatant here */
   if (unqueuedFriendlyCombatants.size <= 1) {
     newMatchContext = { kind: "moveSelectionConfirmation" };
   } else {

@@ -200,6 +200,12 @@ export interface IMatchEventDamage extends IMatchEvent {
   matchCombatantId: Id;
 }
 
+export interface IMatchEventRelocation extends IMatchEvent {
+  boardPositionId: Id;
+  category: "relocation";
+  matchCombatantId: Id;
+}
+
 export interface IMatchesChannelJSON {
   kind: "initial" | "update";
   match: IMatchJSON;
