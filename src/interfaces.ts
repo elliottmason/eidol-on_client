@@ -102,9 +102,11 @@ export interface ICombatant {
   id: Id;
   isFriendly: true;
   isSelectedForDeployment: boolean;
+  maximumEnergy: number;
   maximumHealth: number;
   moves: List<IMove>;
   name: string;
+  remainingEnergy: number;
   remainingHealth: number;
 }
 

@@ -29,6 +29,9 @@ import {
   IMoveSelection,
   MatchContext,
   IMatchEventRelocation,
+  IPlayer,
+  IMatchEvent,
+  IBoardPosition,
 } from "./interfaces";
 import { nullCombatant } from "./nullObjects";
 
@@ -226,12 +229,12 @@ const syncMatch: (state: IAppState, action: IActionSyncMatch) => IAppState = (
 ): IAppState => {
   const matchJSON: IMatchJSON = action.match;
 
-  const boardPositions = List(matchJSON.boardPositions);
-  const combatants = List(matchJSON.combatants);
-  const events = List(matchJSON.events);
-  const players = List(matchJSON.players);
+  const boardPositions: List<IBoardPosition> = List(matchJSON.boardPositions);
+  const combatants: List<ICombatant> = List(matchJSON.combatants);
+  const events: List<IMatchEvent> = List(matchJSON.events);
+  const players: List<IPlayer> = List(matchJSON.players);
 
-  let { id, turn } = matchJSON;
+  const { id, turn } = matchJSON;
 
   const combatantDeployments: List<ICombatantDeployment> = List();
 
@@ -351,8 +354,6 @@ const playMatchEventRelocation: (
     oldCombatantIndex,
   );
 
-  console.log(oldCombatant);
-
   if (oldCombatant !== undefined) {
     const newCombatant: ICombatant = {
       ...oldCombatant,
@@ -363,8 +364,6 @@ const playMatchEventRelocation: (
       oldCombatantIndex,
       newCombatant,
     );
-
-    console.log(newCombatant);
 
     return {
       ...state,

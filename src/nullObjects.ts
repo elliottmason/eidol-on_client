@@ -13,9 +13,11 @@ export const nullCombatant: ICombatant = {
   id: "0",
   isFriendly: true,
   isSelectedForDeployment: false,
+  maximumEnergy: 0,
   maximumHealth: 0,
   moves: List(),
   name: "",
+  remainingEnergy: 0,
   remainingHealth: 0,
 };
 
