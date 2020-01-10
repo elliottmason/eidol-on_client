@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import React from "react";
 
 import { StatBar } from "./StatBar";
 
@@ -7,8 +7,6 @@ interface IHealthBarProps {
   maximumHealth: number;
   remainingHealth: number;
 }
-
-const centurn: number = 100;
 
 export class HealthBar
   extends React.Component<IHealthBarProps> {

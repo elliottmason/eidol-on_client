@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import React from "react";
 
 import { StatBar } from "./StatBar";
 
@@ -7,8 +7,6 @@ interface IEnergyBarProps {
   maximumEnergy: number;
   remainingEnergy: number;
 }
-
-const centurn: number = 100;
 
 export class EnergyBar extends React.Component<IEnergyBarProps> {
   public render(): JSX.Element {
