@@ -15,10 +15,16 @@ export type Action =
   | IActionPlayMatchEvent
   | IActionSelectCombatantForDeployment
   | IActionSelectMove
+  | IActionSetAccount
   | IActionSubmitCombatantDeployments
   | IActionSubmitMoveSelections
   | IActionSyncMatch
   | IActionTargetBoardPosition;
+
+export interface IAccount {
+  id: Id;
+  username: string;
+}
 
 export interface IAction {
   type: string;
@@ -52,6 +58,11 @@ export interface IActionSelectMove extends IAction {
   type: "SELECT_MOVE";
 }
 
+export interface IActionSetAccount extends IAction {
+  account: IAccount;
+  type: "SET_ACCOUNT";
+}
+
 export interface IActionSubmitCombatantDeployments extends IAction {
   type: "SUBMIT_COMBATANT_DEPLOYMENTS";
 }
@@ -71,6 +82,7 @@ export interface IActionTargetBoardPosition extends IAction {
 }
 
 export interface IAppState {
+  account: IAccount;
   match: IMatch;
 }
 

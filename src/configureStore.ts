@@ -18,24 +18,29 @@ import {
   IActionSyncMatch,
   IActionTargetBoardPosition,
   IAppState,
+  IBoardPosition,
   ICombatant,
   ICombatantDeployment,
   Id,
   IDeployedCombatantMoveTargeting,
   IMatch,
+  IMatchEvent,
   IMatchEventDamage,
+  IMatchEventRelocation,
   IMatchJSON,
   IMatchUpdatePending,
   IMoveSelection,
-  MatchContext,
-  IMatchEventRelocation,
   IPlayer,
-  IMatchEvent,
-  IBoardPosition,
+  MatchContext,
+  IActionSetAccount,
 } from "./interfaces";
 import { nullCombatant } from "./nullObjects";
 
 const initialState: IAppState = {
+  account: {
+    id: "0",
+    username: "",
+  },
   match: {
     boardPositions: List(),
     combatantDeployments: List(),
@@ -428,6 +433,21 @@ const selectCombatantForDeployment: (
   };
 };
 
+const setAccount: (
+  state: IAppState,
+  action: IActionSetAccount,
+) => IAppState = (
+  state: IAppState,
+  action: IActionSetAccount,
+): IAppState => {
+  const { account } = action;
+
+  return {
+    ...state,
+    account,
+  }
+};
+
 const targetBoardPosition: (
   state: IAppState,
   action: IActionTargetBoardPosition,
@@ -529,6 +549,8 @@ export const rootReducer: (
       return selectCombatantForDeployment(state, action);
     case "SELECT_MOVE":
       return selectMove(state, action);
+    case "SET_ACCOUNT":
+      return setAccount(state, action);
     case "SUBMIT_COMBATANT_DEPLOYMENTS":
     case "SUBMIT_MOVE_SELECTIONS":
       return awaitMatchUpdate(state);

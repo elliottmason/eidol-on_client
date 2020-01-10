@@ -9,6 +9,7 @@ import {
 import "./../stylesheets/App.css";
 import { Index } from "./Index";
 import { Match } from "./Match";
+import { Signin } from "./Signin";
 
 export interface IAppProps {
   match: IMatch;
@@ -21,6 +22,7 @@ class AppComponent extends React.Component<IAppProps> {
       <Router style={{ height: "100%" }}>
         <Index path="/" />
         <Match path="/matches/:id" match={this.props.match} />
+        <Signin path="/sign_in" />
       </Router>
     );
   }
