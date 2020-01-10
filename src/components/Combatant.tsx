@@ -1,4 +1,4 @@
-import React, { CSSProperties, HTMLProps } from "react";
+import React, { CSSProperties } from "react";
 
 import { IBoardPosition, ICombatant } from "../interfaces";
 
@@ -50,6 +50,7 @@ export class Combatant
         bottom,
         height: `${boardPositionSize}vmin`,
         left,
+        pointerEvents: "none",
         position: "absolute",
         textAlign: "center",
         width: `${boardPositionSize}vmin`,
