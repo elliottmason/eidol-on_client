@@ -71,9 +71,10 @@ const submitMoveSelections:
 
     const body: string = JSON.stringify(bodyObject);
 
-    return fetch("http://localhost:4000/match_move_selections", {
+    return fetch("/match_move_selections", {
       body,
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       method: "POST",

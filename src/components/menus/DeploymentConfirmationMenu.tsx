@@ -59,9 +59,10 @@ const submitCombatantDeployments:
 
     const body: string = JSON.stringify(bodyObject);
 
-    return fetch("http://localhost:4000/match_combatant_deployments", {
+    return fetch("/match_combatant_deployments", {
       body,
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       method: "POST",
@@ -75,8 +76,8 @@ const confirmCombatantDeployments:
     (dispatch: Dispatch) => void =>
     (dispatch: Dispatch): void => {
       submitCombatantDeployments(combatantDeployments)
-        .catch(() => undefined)
-        .then(() => undefined);
+        .then()
+        .catch();
       dispatch(awaitMatchUpdate());
     };
 
