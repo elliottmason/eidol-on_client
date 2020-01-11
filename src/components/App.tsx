@@ -7,7 +7,7 @@ import {
   IMatch,
 } from "./../interfaces";
 import "./../stylesheets/App.css";
-import { Index } from "./Index";
+import { Dashboard } from "./Dashboard";
 import { Match } from "./Match";
 import { Signin } from "./Signin";
 
@@ -20,7 +20,7 @@ class AppComponent extends React.Component<IAppProps> {
   public render(): JSX.Element {
     return (
       <Router style={{ height: "100%" }}>
-        <Index path="/" />
+        <Dashboard path="/" />
         <Match path="/matches/:id" match={this.props.match} />
         <Signin path="/sign_in" />
       </Router>
@@ -29,9 +29,7 @@ class AppComponent extends React.Component<IAppProps> {
 }
 
 const mapStateToProps: (state: IAppState) => { match: IMatch } =
-  (state: IAppState): { match: IMatch } => (
-    { match: state.match }
-  );
+  (state: IAppState): { match: IMatch } => ({ match: state.match });
 
 export const App:
   ConnectedComponentClass<typeof AppComponent, Pick<IAppProps, never>> =

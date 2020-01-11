@@ -15,6 +15,7 @@ import {
   IActionPlayMatchEvent,
   IActionSelectCombatantForDeployment,
   IActionSelectMove,
+  IActionSetAccount,
   IActionSyncMatch,
   IActionTargetBoardPosition,
   IAppState,
@@ -32,7 +33,6 @@ import {
   IMoveSelection,
   IPlayer,
   MatchContext,
-  IActionSetAccount,
 } from "./interfaces";
 import { nullCombatant } from "./nullObjects";
 

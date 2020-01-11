@@ -1,5 +1,7 @@
+import { navigate } from "@reach/router";
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
+import { Dispatch } from "redux";
 
 import {
   IAccount,
@@ -10,10 +12,6 @@ interface ISigninProps {
   path: string;
 }
 
-interface ISigninComponentProps extends ISigninProps {
-  dispatch(func: {}): void;
-}
-
 const setAccount: (account: IAccount) => IActionSetAccount =
   (account: IAccount): IActionSetAccount => (
   {
@@ -22,8 +20,10 @@ const setAccount: (account: IAccount) => IActionSetAccount =
   }
 );
 
-const SigninComponent: (props: ISigninComponentProps) => JSX.Element =
-  (props: ISigninComponentProps): JSX.Element => {
+export const Signin: (props: ISigninProps) => JSX.Element =
+    (props: ISigninProps): JSX.Element => {
+  const dispatch: Dispatch = useDispatch();
+
   const [emailAddress, setEmailAddress] = useState("");
 
   const handleEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void =
@@ -35,8 +35,6 @@ const SigninComponent: (props: ISigninComponentProps) => JSX.Element =
   const submit: (e: React.MouseEvent) => void =
   (e: React.MouseEvent): void => {
     e.preventDefault();
-
-    const { dispatch } = props;
 
     const body: string =
       JSON.stringify({ session: { email_address: emailAddress } });
@@ -53,22 +51,27 @@ const SigninComponent: (props: ISigninComponentProps) => JSX.Element =
     );
 
     fetch(request)
+      .then(async (response: Response) => {
+        const unauthorizedStatus: number = 401;
+        if (response.status === unauthorizedStatus) {
+          throw new Error("Login failed.");
+        }
+
+        return response.json();
+      })
       .then(
-        (response: Response) => {
-          response.json()
-          .then(
-            (json: { account: IAccount }) => {
-              dispatch(setAccount(json.account));
-            },
-          )
-          .catch();
+        (json: { account: IAccount }) => {
+          dispatch(setAccount(json.account));
+          navigate("/");
         },
       )
-      .catch();
+      .catch((error: Error) => { console.log(error); });
   };
 
   return(
     <div>
+      <h2>Sign in</h2>
+      <p>Enter your email address to sign in.</p>
       <form method="post">
         <label>
           Email
@@ -76,6 +79,7 @@ const SigninComponent: (props: ISigninComponentProps) => JSX.Element =
             onChange={handleEmailChange}
             type="email"
             name="email_address"
+            placeholder="you@gmail.com"
             value={emailAddress}
           />
         </label>
@@ -89,6 +93,3 @@ const SigninComponent: (props: ISigninComponentProps) => JSX.Element =
     </div>
   );
 };
-
-export const Signin: React.ComponentClass<ISigninProps> =
-  connect()(SigninComponent);
