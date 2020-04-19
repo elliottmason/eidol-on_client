@@ -65,7 +65,7 @@ export const Signin: (props: ISigninProps) => JSX.Element =
           navigate("/");
         },
       )
-      .catch((error: Error) => { console.log(error); });
+      .catch();
   };
 
   return(

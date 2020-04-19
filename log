@@ -1,0 +1,18 @@
+1:
+Helljung throws hot coals (1,1) (4,4)
+[combatant] [move verb] [move name]! [coordinates]
+
+2:
+Ampul is hit by Helljung's hot coals
+[combatant] [event type] [source: [subject] [move name]]
+[combatant] [event type] [amount]
+Panser completely evades Helljung's hot coals
+Panser partially evades Helljung's hot coals
+
+3:
+Panser is deresolved.
+[combatant] [event type]
+
+4:
+Eleo deployed Wheetzy to the board. (2,2)
+[player] [event type] [combatant] [coordinate]

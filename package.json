@@ -49,5 +49,6 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-react": "^4.0.0"
-  }
+  },
+  "proxy": "http://api:4000/"
 }
